@@ -28,7 +28,7 @@
   <iframe id="app-frame" title="Training plan under test"></iframe>
 
   <script>
-    const testStorageKeys = ["ftp250-test-plan-v1", "ftp250-test-profile-v1"];
+    const testStorageKeys = ["ftp250-test-plan-v1", "ftp250-test-profile-v1", "ftp250-test-history-v1"];
     const frame = document.querySelector("#app-frame");
     const results = document.querySelector("#results");
     const summary = document.querySelector("#summary");
@@ -71,6 +71,13 @@
       assert(input, `Missing app input ${selector}`);
       input.value = value;
       input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+
+    function setChecked(value, checked) {
+      const input = appDocument.querySelector(`input[name="training-day"][value="${value}"]`);
+      assert(input, `Missing training day ${value}`);
+      input.checked = checked;
       input.dispatchEvent(new Event("change", { bubbles: true }));
     }
 
@@ -126,6 +133,80 @@
       assertEqual(appDocument.querySelector("#ftp-value").textContent, "210", "Invalid FTP should not change the profile");
     }
 
+    async function testWeeklyScheduleAndAvailability() {
+      resetTestStorage();
+      await loadApp();
+      click("#edit-profile");
+      setValue("#profile-current-ftp", "210");
+      setValue("#profile-target-ftp", "260");
+      setValue("#profile-weight", "70");
+      setValue("#profile-age", "38");
+      setValue("#profile-max-hr", "188");
+      setValue("#profile-weekly-hours", "3.5");
+      ["Tue", "Thu", "Sat", "Sun"].forEach((day) => setChecked(day, false));
+      ["Mon", "Tue", "Thu"].forEach((day) => setChecked(day, true));
+      click("#profile-form button[type=submit]");
+      assertEqual(appDocument.querySelector("#profile-dialog").open, true, "Back-to-back key rides should be rejected");
+      assert(appDocument.querySelector("#toast").textContent.includes("rest day"), "Schedule error should explain the recovery spacing");
+
+      ["Mon", "Tue", "Thu"].forEach((day) => setChecked(day, false));
+      ["Mon", "Wed", "Fri"].forEach((day) => setChecked(day, true));
+      click("#profile-form button[type=submit]");
+      assertEqual(appDocument.querySelectorAll("#workout-list .workout").length, 3, "Three selected days should schedule only the key rides");
+      assertEqual([...appDocument.querySelectorAll("#workout-list .day")].map((node) => node.firstChild.textContent).join(","), "Mon,Wed,Fri", "Key rides should use the selected days");
+      assertEqual(appDocument.querySelector("#week-volume").textContent, "~3h 30m", "Scheduled volume should exclude an omitted recovery ride");
+      assert(appDocument.querySelector("#budget-warning").textContent.includes("optional recovery ride is not scheduled"), "A three-day schedule should omit the optional ride when it exceeds hours");
+      click("#week-tabs .week-tab:nth-child(2)");
+      assert(appDocument.querySelector("#budget-warning").textContent.includes("above your 3.5 h availability"), "Over-budget key sessions should show a warning");
+
+      click("#edit-profile");
+      setValue("#profile-weekly-hours", "4");
+      ["Mon", "Wed", "Fri"].forEach((day) => setChecked(day, false));
+      ["Tue", "Thu", "Sat", "Sun"].forEach((day) => setChecked(day, true));
+      click("#profile-form button[type=submit]");
+      click("#week-tabs .week-tab:nth-child(1)");
+      assertEqual(appDocument.querySelectorAll("#workout-list .workout").length, 4, "A fourth day and sufficient hours should enable recovery");
+      assertEqual(appDocument.querySelector("#workout-list .workout:last-child .day").firstChild.textContent, "Sun", "Optional recovery should use the fourth selected day");
+      click("#week-tabs .week-tab:nth-child(4)");
+      assert(appDocument.querySelector("#workout-list .workout:last-child .day").textContent.includes("rest day"), "A deload rest session should be labeled as rest");
+      await loadApp();
+      click("#edit-profile");
+      assertEqual(appDocument.querySelector("#profile-weekly-hours").value, "4", "Weekly availability should persist");
+      assertEqual([...appDocument.querySelectorAll('input[name="training-day"]:checked')].map((input) => input.value).join(","), "Tue,Thu,Sat,Sun", "Training days should persist");
+      click("#cancel-profile");
+    }
+
+    async function testFtpHistoryUpdatesTargets() {
+      resetTestStorage();
+      await loadApp();
+      click("#edit-profile");
+      setValue("#profile-current-ftp", "210");
+      setValue("#profile-target-ftp", "260");
+      setValue("#profile-weight", "70");
+      setValue("#profile-age", "38");
+      setValue("#profile-max-hr", "188");
+      click("#profile-form button[type=submit]");
+      setValue("#ftp-test-date", "2026-10-01");
+      setValue("#ftp-test-result", "225");
+      click("#ftp-test-form button[type=submit]");
+      assertEqual(appDocument.querySelector("#ftp-value").textContent, "225", "Retest should update current FTP");
+      assert(appDocument.querySelector(".power-target").textContent.includes("198–212 W"), "Future session watt guidance should use the new FTP");
+      assertEqual(appDocument.querySelectorAll(".ftp-test-row").length, 1, "Retest should appear in history");
+
+      setValue("#ftp-test-date", "2026-10-01");
+      setValue("#ftp-test-result", "230");
+      click("#ftp-test-form button[type=submit]");
+      assertEqual(appDocument.querySelectorAll(".ftp-test-row").length, 1, "A second result on the same date should replace that day's entry");
+      assert(appDocument.querySelector(".power-target").textContent.includes("202–216 W"), "Watt guidance should recalculate after the replacement result");
+
+      setValue("#ftp-test-date", "2026-10-04");
+      setValue("#ftp-test-result", "235");
+      click("#ftp-test-form button[type=submit]");
+      await loadApp();
+      assertEqual(appDocument.querySelector("#ftp-value").textContent, "235", "Latest FTP result should persist after reload");
+      assertEqual(appDocument.querySelectorAll(".ftp-test-row").length, 2, "Dated test history should persist after reload");
+    }
+
     async function testWorkoutProgressPersists() {
       resetTestStorage();
       await loadApp();
@@ -161,6 +242,11 @@
       const schema = await response.text();
       assert(schema.includes("alter table public.training_profiles enable row level security"), "Profile table should enable RLS");
       assert(schema.includes("alter table public.workout_completions enable row level security"), "Completion table should enable RLS");
+      assert(schema.includes("create table if not exists public.ftp_tests"), "FTP test history should have a database table");
+      assert(schema.includes("alter table public.ftp_tests enable row level security"), "FTP test history should enable RLS");
+      assert(schema.includes("Users read own FTP tests"), "FTP test history should have owner-only policies");
+      assert(schema.includes("weekly_hours numeric"), "Weekly availability should be stored in the profile");
+      assert(schema.includes("training_days text[]"), "Training days should be stored in the profile");
       assert(schema.includes("using (user_id = (select auth.uid()))"), "RLS policies should scope records to the signed-in user");
     }
 
@@ -170,6 +256,8 @@
         ["Profile-first descriptions use each rider's values", testFirstVisitDescriptionUsesProfile],
         ["Profile metrics, zones, and reload persistence", testProfileCalculationsAndPersistence],
         ["Reject invalid profile values", testInvalidProfileIsRejected],
+        ["Schedule selected days within weekly availability", testWeeklyScheduleAndAvailability],
+        ["Log FTP tests and recalculate future watt targets", testFtpHistoryUpdatesTargets],
         ["Persist workout progress by week", testWorkoutProgressPersists],
         ["Link routes across all training weeks", testRouteLinksAcrossPlan],
         ["Keep guest mode isolated and verify RLS schema", testGuestModeAndRlsSchema]
