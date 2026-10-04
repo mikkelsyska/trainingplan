@@ -421,8 +421,9 @@
       ]}
     ];
 
-    const storageKey = "ftp250-plan-v1";
-    const profileStorageKey = "ftp250-guest-profile-v1";
+    const isTestMode = new URLSearchParams(window.location.search).has("testMode");
+    const storageKey = isTestMode ? "ftp250-test-plan-v1" : "ftp250-plan-v1";
+    const profileStorageKey = isTestMode ? "ftp250-test-profile-v1" : "ftp250-guest-profile-v1";
     let saved = {};
     try { saved = JSON.parse(localStorage.getItem(storageKey) || "{}"); } catch { saved = {}; }
     let profile = null;
@@ -432,7 +433,7 @@
     let currentWeek = 0;
     let ftp = Number(profile?.currentFtp) || 0;
     const config = window.TRAINING_PLAN_SUPABASE || {};
-    const supabaseClient = config.url && config.anonKey && window.supabase?.createClient
+    const supabaseClient = !isTestMode && config.url && config.anonKey && window.supabase?.createClient
       ? window.supabase.createClient(config.url, config.anonKey)
       : null;
     let accountUser = null;

@@ -14,3 +14,7 @@ The page supports browser-only guest profiles. Cross-device profiles and workout
 6. Visit the site, create an account, confirm the email if required, sign in, and fill in the rider profile. The profile and ride checkoffs will then load for that account on other devices after sign-in.
 
 The Supabase URL and publishable key are visible in the browser by design. The database must have the supplied row-level security policies enabled; they prevent one signed-in user from reading or changing another user's data. Until Supabase is configured, profiles and progress remain in that browser only.
+
+## Tests
+
+Run the dependency-free browser regression suite at `https://mikkelsyska.github.io/trainingplan/tests/`, or serve the repository root locally and open `/tests/`. Select **Run Tests** to exercise profile calculations and validation, reload persistence, per-week progress, route coverage, and the RLS schema guards. The suite uses isolated test storage and does not clear guest data. It checks the schema text but does not replace testing against a configured Supabase project.
