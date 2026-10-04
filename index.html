@@ -7,7 +7,8 @@
   <script>
     try { if (localStorage.getItem("ftp250-theme") === "dark") document.documentElement.dataset.theme = "dark"; } catch {}
   </script>
-  <title>FTP 250 | Zwift training plan</title>
+  <meta name="description" content="Create a rider profile to set your FTP goal, weight, age, and max heart rate. Your Zwift training plan, W/kg, and power zones will use your details.">
+  <title>Zwift FTP training plan</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -263,7 +264,7 @@
         <div class="hero-copy">
           <div class="eyebrow">12-WEEK FTP BUILD · ZWIFT FIRST</div>
           <h1 id="page-title">Chase <span id="goal-headline">your goal.</span></h1>
-          <p class="hero-sub" id="hero-copy">Add a rider profile to personalize FTP targets, power zones, and your training progress.</p>
+          <p class="hero-sub" id="hero-copy">Create your rider profile to set your current and goal FTP, weight, age, and max heart rate. Your W/kg and power zones will then use your details.</p>
         </div>
         <div class="hero-image" role="img" aria-label="Road cyclist riding hard on a mountain road"><span class="image-label">BUILD THE ENGINE / HOLD THE LINE</span></div>
       </section>
@@ -621,9 +622,13 @@
       document.querySelector("#target-wkg").textContent = targetFtp && weight ? (targetFtp / weight).toFixed(2) : "—";
       document.querySelector("#goal-gain").textContent = currentFtp && targetFtp ? `${targetFtp - currentFtp > 0 ? "+" : ""}${targetFtp - currentFtp} W · ${Math.round((targetFtp / currentFtp - 1) * 100)}% goal` : "set your goal";
       document.querySelector("#goal-headline").textContent = targetFtp ? `${targetFtp} watts.` : "your goal.";
+      document.title = targetFtp ? `FTP ${targetFtp} | Zwift training plan` : "Zwift FTP training plan";
+      document.querySelector('meta[name="description"]').content = currentFtp && targetFtp && weight
+        ? `Personalized Zwift FTP plan: ${currentFtp} W current FTP, ${targetFtp} W goal, ${weight} kg rider.`
+        : "Create a rider profile to set your FTP goal, weight, age, and max heart rate. Your Zwift training plan, W/kg, and power zones will use your details.";
       document.querySelector("#hero-copy").innerHTML = currentFtp && targetFtp && weight
         ? `A progressive indoor cycling block built around Zwift workouts. From <strong>${currentFtp} W to a ${targetFtp} W goal</strong> for a ${weight} kg rider: a meaningful jump, earned one repeatable week at a time.`
-        : "Add a rider profile to personalize FTP targets, power zones, and your training progress.";
+        : "Create your rider profile to set your current and goal FTP, weight, age, and max heart rate. Your W/kg and power zones will then use your details.";
     }
     function renderZones() {
       const zones = [["Recovery", "Very easy", .01, .55], ["Endurance", "All-day pace", .56, .75], ["Tempo", "Steady", .76, .90], ["Sweet spot", "Strong / controlled", .88, .94], ["Threshold", "Hard / sustainable", .95, 1.05], ["VO₂max", "Very hard", 1.06, 1.20]];

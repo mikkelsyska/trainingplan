@@ -98,6 +98,25 @@
       assertEqual(appDocument.querySelector("#weight-value").textContent, "70", "Weight should persist after reload");
     }
 
+    async function testFirstVisitDescriptionUsesProfile() {
+      resetTestStorage();
+      await loadApp();
+      assertEqual(appDocument.title, "Zwift FTP training plan", "First-visit title should not assume an FTP target");
+      assert(appDocument.querySelector('meta[name="description"]').content.includes("Create a rider profile"), "Meta description should ask users to create a profile");
+      assert(appDocument.querySelector("#hero-copy").textContent.includes("Create your rider profile"), "Hero should explain profile setup");
+      assert(!appDocument.querySelector("#hero-copy").textContent.includes("82 kg"), "First-visit copy should not show a fixed rider weight");
+
+      click("#edit-profile");
+      setValue("#profile-current-ftp", "210");
+      setValue("#profile-target-ftp", "260");
+      setValue("#profile-weight", "70");
+      setValue("#profile-age", "38");
+      setValue("#profile-max-hr", "188");
+      click("#profile-form button[type=submit]");
+      assertEqual(appDocument.title, "FTP 260 | Zwift training plan", "Document title should use the user's FTP goal");
+      assert(appDocument.querySelector('meta[name="description"]').content.includes("210 W current FTP, 260 W goal, 70 kg rider"), "Meta description should use the profile values");
+    }
+
     async function testInvalidProfileIsRejected() {
       await loadApp();
       click("#edit-profile");
@@ -148,6 +167,7 @@
     async function runTests() {
       const savedTheme = localStorage.getItem("ftp250-theme");
       const tests = [
+        ["Profile-first descriptions use each rider's values", testFirstVisitDescriptionUsesProfile],
         ["Profile metrics, zones, and reload persistence", testProfileCalculationsAndPersistence],
         ["Reject invalid profile values", testInvalidProfileIsRejected],
         ["Persist workout progress by week", testWorkoutProgressPersists],
