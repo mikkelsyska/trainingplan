@@ -77,6 +77,8 @@
     .quiet-link { color: var(--muted); text-decoration: none; font-size: 12px; font-weight: 700; }
     .print-button { display: inline-flex; gap: 8px; align-items: center; border: 1px solid var(--line); background: transparent; padding: 9px 13px; border-radius: 3px; font-size: 12px; font-weight: 700; cursor: pointer; }
     .print-button:hover { background: var(--hover-surface); }
+    .account-button { border: 1px solid var(--line); border-radius: 3px; background: transparent; padding: 9px 12px; color: var(--green); font-size: 11px; font-weight: 700; cursor: pointer; }
+    .account-button:hover { background: var(--hover-surface); }
     .theme-button { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 3px; background: transparent; color: var(--ink); font-size: 19px; cursor: pointer; }
     .theme-button:hover { background: var(--hover-surface); }
     .theme-button:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
@@ -170,6 +172,7 @@
     .toast { position: fixed; z-index: 5; right: 20px; bottom: 20px; padding: 12px 16px; background: var(--toast-bg); color: var(--toast-text); font-size: 12px; box-shadow: 0 5px 20px #20231f22; }
     .toast[hidden] { display: none; }
     dialog { width: min(360px, calc(100% - 32px)); border: 1px solid var(--ink); border-radius: 3px; padding: 22px; background: var(--white); color: var(--ink); box-shadow: 0 20px 80px #20231f33; }
+    #profile-dialog { width: min(460px, calc(100% - 32px)); max-height: 88vh; overflow-y: auto; }
     dialog::backdrop { background: #20231f88; }
     dialog h3 { margin: 0; font: 800 28px var(--display); text-transform: uppercase; }
     dialog p { color: var(--muted); font-size: 12px; line-height: 1.55; }
@@ -178,6 +181,17 @@
     .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; }
     .dialog-actions button { border: 1px solid var(--line); border-radius: 2px; background: transparent; padding: 9px 13px; font-size: 11px; font-weight: 700; cursor: pointer; }
     .dialog-actions button:last-child { border-color: var(--primary-bg); background: var(--primary-bg); color: var(--primary-text); }
+    .profile-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 18px 0; }
+    .profile-field { display: grid; gap: 5px; color: var(--muted); font-size: 10px; font-weight: 700; }
+    .profile-field input { width: 100%; min-width: 0; padding: 10px; border: 1px solid var(--line); border-radius: 2px; background: var(--white); color: var(--ink); font-weight: 700; }
+    .auth-panel { margin: 0 0 18px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+    .auth-panel p { margin: 0 0 10px; }
+    .auth-fields { display: grid; gap: 9px; }
+    .auth-fields input { width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 2px; background: var(--white); color: var(--ink); }
+    .auth-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+    .auth-actions button { border: 1px solid var(--line); border-radius: 2px; background: transparent; padding: 9px 11px; font-size: 10px; font-weight: 700; cursor: pointer; }
+    .auth-actions button:last-child { border-color: var(--primary-bg); background: var(--primary-bg); color: var(--primary-text); }
+    .auth-actions button:disabled { opacity: .55; cursor: wait; }
     @media (max-width: 800px) {
       .shell { padding: 0 24px 50px; }
       .hero { min-height: 325px; grid-template-columns: 1fr .7fr; gap: 18px; }
@@ -192,6 +206,8 @@
       .shell { padding: 0 17px 36px; }
       .topbar { height: 62px; }
       .brand small, .quiet-link { display: none; }
+      .top-actions { gap: 8px; }
+      .account-button { padding: 9px 8px; font-size: 10px; }
       .hero { min-height: 0; display: flex; flex-direction: column; align-items: stretch; gap: 20px; padding: 34px 0 25px; }
       .hero-image { min-height: 185px; }
       h1 { font-size: clamp(66px, 20vw, 94px); }
@@ -237,6 +253,7 @@
         <a class="quiet-link" href="#plan">THE PLAN</a>
         <a class="quiet-link" href="#zones">POWER ZONES</a>
         <button class="theme-button" id="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode" aria-pressed="false"><span id="theme-icon" aria-hidden="true">☾</span></button>
+        <button class="account-button" id="account-button" type="button">PROFILE</button>
         <button class="print-button" id="print-plan" type="button" aria-label="Print plan"><span aria-hidden="true">↗</span> PRINT</button>
       </nav>
     </header>
@@ -245,17 +262,17 @@
       <section class="hero" aria-labelledby="page-title">
         <div class="hero-copy">
           <div class="eyebrow">12-WEEK FTP BUILD · ZWIFT FIRST</div>
-          <h1 id="page-title">Chase <span>250 watts.</span></h1>
-          <p class="hero-sub">A progressive indoor cycling block built around Zwift workouts. From <strong>212 W to a 250 W goal</strong> for an 82 kg rider: a meaningful jump, earned one repeatable week at a time.</p>
+          <h1 id="page-title">Chase <span id="goal-headline">your goal.</span></h1>
+          <p class="hero-sub" id="hero-copy">Add a rider profile to personalize FTP targets, power zones, and your training progress.</p>
         </div>
         <div class="hero-image" role="img" aria-label="Road cyclist riding hard on a mountain road"><span class="image-label">BUILD THE ENGINE / HOLD THE LINE</span></div>
       </section>
 
       <section class="metrics" aria-label="Rider and goal metrics">
-        <div class="metric"><span class="metric-label">Current FTP <button class="ftp-edit" id="edit-ftp" type="button">EDIT</button></span><div class="metric-value"><span id="ftp-value">212</span><small>W</small></div><div class="metric-note"><span id="current-wkg">2.59</span> W/kg · tested baseline</div></div>
-        <div class="metric"><span class="metric-label">Target FTP</span><div class="metric-value">250<small>W</small></div><div class="metric-note">3.05 W/kg · +18% goal</div></div>
-        <div class="metric"><span class="metric-label">Rider</span><div class="metric-value">82<small>kg</small></div><div class="metric-note">45 years · male</div></div>
-        <div class="metric"><span class="metric-label">Max heart rate</span><div class="metric-value">193<small>bpm</small></div><div class="metric-note">Power-led training · HR secondary</div></div>
+        <div class="metric"><span class="metric-label">Current FTP <button class="ftp-edit" id="edit-profile" type="button">EDIT PROFILE</button></span><div class="metric-value"><span id="ftp-value">—</span><small>W</small></div><div class="metric-note"><span id="current-wkg">—</span> W/kg · current baseline</div></div>
+        <div class="metric"><span class="metric-label">Target FTP</span><div class="metric-value"><span id="target-ftp-value">—</span><small>W</small></div><div class="metric-note"><span id="target-wkg">—</span> W/kg · <span id="goal-gain">set your goal</span></div></div>
+        <div class="metric"><span class="metric-label">Rider weight</span><div class="metric-value"><span id="weight-value">—</span><small>kg</small></div><div class="metric-note">Age · <span id="age-value">—</span> years</div></div>
+        <div class="metric"><span class="metric-label">Max heart rate</span><div class="metric-value"><span id="max-hr-value">—</span><small>bpm</small></div><div class="metric-note">Power-led training · HR secondary</div></div>
       </section>
 
       <section class="plan-layout" id="plan" aria-label="Training plan">
@@ -268,7 +285,7 @@
             <li class="phase"><span class="phase-number">02</span><span class="phase-name">Raise the ceiling<span class="phase-weeks">Weeks 5–8 · threshold, then deload</span></span></li>
             <li class="phase"><span class="phase-number">03</span><span class="phase-name">Convert & test<span class="phase-weeks">Weeks 9–12 · sharpen, taper, retest</span></span></li>
           </ol>
-          <div class="coach-note"><strong>Keep the easy days easy</strong>Power targets use your current FTP. Update it after a credible retest; don't force the 250 W target into workouts before your fitness is there.</div>
+          <div class="coach-note"><strong>Keep the easy days easy</strong>Power targets use the current FTP in your profile. Re-test periodically and update your profile; don't force your goal into workouts before your fitness is there.</div>
         </aside>
 
         <div class="plan-main">
@@ -288,26 +305,46 @@
           <div class="eyebrow">POWER GUIDE</div>
           <h3 id="zones-title">Train the right gear.</h3>
           <p>Approximate power zones based on your current FTP. Zwift scales its workouts from the FTP saved in your profile, so keep that number current. The workout's prescribed intervals take priority over these general ranges.</p>
-          <p>Your reported 193 bpm maximum is not enough to set precise heart-rate zones. Heart rate lags during intervals and varies with fatigue, heat, and hydration; use it as context, not a target to chase.</p>
+          <p>Your recorded maximum heart rate (<span id="zone-max-hr">—</span> bpm) is not enough to set precise heart-rate zones. Heart rate lags during intervals and varies with fatigue, heat, and hydration; use it as context, not a target to chase.</p>
         </div>
         <table class="zone-table"><thead><tr><th>Zone</th><th>Effort</th><th>Power range</th></tr></thead><tbody id="zone-rows"></tbody></table>
       </section>
       <footer class="fine-print">
-        <p>This is a general training template, not medical advice or a guaranteed FTP result. A 212 → 250 W jump in 12 weeks is ambitious and depends on training history, recovery, health, and accurate testing. Reduce or skip intensity if unwell, unusually fatigued, or in pain; consult a qualified clinician before starting if you have health concerns.</p>
+        <p>This is a general training template, not medical advice or a guaranteed FTP result. A substantial FTP increase over 12 weeks is ambitious and depends on training history, recovery, health, and accurate testing. Reduce or skip intensity if unwell, unusually fatigued, or in pain; consult a qualified clinician before starting if you have health concerns.</p>
         <p>Workout and route links open What's on Zwift, an independently maintained catalog, not the Zwift app. Names and availability can change, and worlds rotate on Zwift's schedule. <a href="https://support.zwift.com/en_us/workout-plans-Hk6pChw4H" target="_blank" rel="noreferrer">Official Zwift workout plans ↗</a></p>
       </footer>
     </main>
   </div>
-  <dialog id="ftp-dialog" aria-labelledby="ftp-dialog-title">
-    <form method="dialog" id="ftp-form">
-      <h3 id="ftp-dialog-title">Update current FTP</h3>
-      <p>Use a recent, well-paced test or trusted estimate. This updates the power zone guide and W/kg value; Zwift workouts also need your FTP updated in Zwift.</p>
-      <label class="ftp-field"><input id="ftp-input" type="number" min="80" max="500" step="1" required aria-label="Current FTP in watts"><span>watts</span></label>
-      <div class="dialog-actions"><button value="cancel" type="submit">CANCEL</button><button id="save-ftp" value="save" type="submit">UPDATE FTP</button></div>
+    <form id="account-form" hidden></form>
+  <dialog id="profile-dialog" aria-labelledby="profile-dialog-title">
+    <form id="profile-form">
+      <h3 id="profile-dialog-title">Rider profile</h3>
+      <p id="profile-storage-note">This guest profile and ride checkoffs are saved only in this browser.</p>
+      <section class="auth-panel" aria-label="Account and cross-device sync">
+        <p id="account-status">Sign in or create an account to sync your profile and ride progress across devices.</p>
+        <div id="auth-controls">
+          <div class="auth-fields">
+            <input id="account-email" form="account-form" type="email" autocomplete="username" placeholder="Email address" aria-label="Account email" required>
+            <input id="account-password" form="account-form" type="password" autocomplete="current-password" placeholder="Password (8 characters minimum)" aria-label="Account password" minlength="8" required>
+          </div>
+          <div class="auth-actions"><button id="sign-in" type="button">SIGN IN</button><button id="create-account" type="button">CREATE ACCOUNT</button></div>
+        </div>
+        <div id="account-session" hidden><p id="signed-in-email"></p><button type="button" id="sign-out">SIGN OUT</button></div>
+      </section>
+      <div class="profile-fields">
+        <label class="profile-field">Current FTP (W)<input id="profile-current-ftp" type="number" min="80" max="500" step="1" required></label>
+        <label class="profile-field">FTP goal (W)<input id="profile-target-ftp" type="number" min="80" max="600" step="1" required></label>
+        <label class="profile-field">Weight (kg)<input id="profile-weight" type="number" min="30" max="250" step="0.1" required></label>
+        <label class="profile-field">Age<input id="profile-age" type="number" min="16" max="100" step="1" required></label>
+        <label class="profile-field">Max heart rate (bpm)<input id="profile-max-hr" type="number" min="100" max="240" step="1" required></label>
+      </div>
+      <div class="dialog-actions"><button type="button" id="cancel-profile">CANCEL</button><button type="submit">SAVE PROFILE</button></div>
     </form>
   </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
+  <script src="./supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const weeks = [
       { phase: "Base", focus: "Find your rhythm", volume: "~4h", rides: [
@@ -379,16 +416,27 @@
       { phase: "Test", focus: "Taper + retest", volume: "~2h 15m", test: true, rides: [
         ["Tue", "Open the legs", "SST (Short)", "2 × 6 min at 88–92% FTP, with full easy recovery. Keep it short.", "45 min", "Light sweet spot"],
         ["Thu", "Easy spin", "Endurance / Zone 2", "30–40 minutes very easy; stop while feeling fresh.", "35 min", "Easy · 60–65%"],
-        ["Sat", "Goal FTP test", "Ramp Test / FTP test", "Test rested, fueled, and on a familiar protocol. Compare like-for-like; 250 W is a goal, not a pass/fail line.", "45–60 min", "Retest"],
+        ["Sat", "Goal FTP test", "Ramp Test / FTP test", "Test rested, fueled, and on a familiar protocol. Compare like-for-like; your target is a goal, not a pass/fail line.", "45–60 min", "Retest"],
         ["Sun", "Recover + review", "Off-bike recovery", "Rest, review the block, and plan the next one from the test result.", "Rest", "Recovery"]
       ]}
     ];
 
     const storageKey = "ftp250-plan-v1";
+    const profileStorageKey = "ftp250-guest-profile-v1";
     let saved = {};
     try { saved = JSON.parse(localStorage.getItem(storageKey) || "{}"); } catch { saved = {}; }
+    let profile = null;
+    try { profile = JSON.parse(localStorage.getItem(profileStorageKey) || "null"); } catch { profile = null; }
+    if (!profile && Number(saved.ftp) > 0) profile = { currentFtp: Number(saved.ftp) };
+    delete saved.ftp;
     let currentWeek = 0;
-    let ftp = Number(saved.ftp) || 212;
+    let ftp = Number(profile?.currentFtp) || 0;
+    const config = window.TRAINING_PLAN_SUPABASE || {};
+    const supabaseClient = config.url && config.anonKey && window.supabase?.createClient
+      ? window.supabase.createClient(config.url, config.anonKey)
+      : null;
+    let accountUser = null;
+    let accountSyncId = null;
     const workoutList = document.querySelector("#workout-list");
     const zwiftWorkoutLinks = {
       "SST (Short)": "https://whatsonzwift.com/workouts/less-than-60-minutes-to-burn/sst-short",
@@ -417,7 +465,10 @@
     }
 
     function persist() {
-      try { localStorage.setItem(storageKey, JSON.stringify({ ...saved, ftp })); } catch { showToast("Progress could not be saved in this browser."); }
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(saved));
+        if (profile) localStorage.setItem(profileStorageKey, JSON.stringify(profile));
+      } catch { showToast("Profile or progress could not be saved in this browser."); }
     }
     function showToast(message) {
       const toast = document.querySelector("#toast");
@@ -426,11 +477,156 @@
       clearTimeout(showToast.timer);
       showToast.timer = setTimeout(() => { toast.hidden = true; }, 2600);
     }
+    function isCompleteProfile(value) {
+      return value && ["currentFtp", "targetFtp", "weightKg", "age", "maxHr"].every((key) => Number.isFinite(Number(value[key])) && Number(value[key]) > 0);
+    }
+    function localCompletionRows(userId) {
+      return Object.entries(saved).flatMap(([key, completed]) => {
+        if (!completed || !/^\d+-\d+$/.test(key)) return [];
+        const [weekIndex, workoutIndex] = key.split("-").map(Number);
+        return [{ user_id: userId, week_index: weekIndex, workout_index: workoutIndex }];
+      });
+    }
+    function renderAccountUI(message) {
+      const configured = Boolean(supabaseClient);
+      const authControls = document.querySelector("#auth-controls");
+      const accountSession = document.querySelector("#account-session");
+      const storageNote = document.querySelector("#profile-storage-note");
+      document.querySelector("#account-button").textContent = accountUser ? "ACCOUNT" : "PROFILE";
+      authControls.hidden = !configured || Boolean(accountUser);
+      authControls.querySelectorAll("input").forEach((input) => { input.disabled = authControls.hidden; });
+      accountSession.hidden = !accountUser;
+      document.querySelector("#account-status").textContent = message || "Sign in or create an account to sync your profile and ride progress across devices.";
+      document.querySelector("#signed-in-email").textContent = accountUser ? `Signed in as ${accountUser.email}` : "";
+      storageNote.textContent = accountUser
+        ? "Your profile and ride checkoffs sync to this account across devices."
+        : configured
+          ? "Guest data is local to this browser until you sign in."
+          : "Cloud sync is not configured yet. Guest profile and ride checkoffs stay in this browser.";
+      if (!configured) document.querySelector("#account-status").textContent = "Add a Supabase project URL and publishable key to enable sign-in and cross-device sync.";
+    }
+    async function saveCloudProfile() {
+      if (!accountUser || !supabaseClient || !isCompleteProfile(profile)) return;
+      const { error } = await supabaseClient.from("training_profiles").upsert({
+        user_id: accountUser.id,
+        current_ftp: profile.currentFtp,
+        target_ftp: profile.targetFtp,
+        weight_kg: profile.weightKg,
+        age: profile.age,
+        max_hr: profile.maxHr,
+        updated_at: new Date().toISOString()
+      });
+      if (error) throw error;
+    }
+    async function loadAccountData(user) {
+      if (!user || !supabaseClient || accountSyncId === user.id) return;
+      accountUser = user;
+      accountSyncId = user.id;
+      renderAccountUI("Loading your profile and ride progress…");
+      try {
+        const { data: cloudProfile, error: profileError } = await supabaseClient
+          .from("training_profiles")
+          .select("current_ftp,target_ftp,weight_kg,age,max_hr")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (profileError) throw profileError;
+        if (cloudProfile) {
+          profile = {
+            currentFtp: Number(cloudProfile.current_ftp),
+            targetFtp: Number(cloudProfile.target_ftp),
+            weightKg: Number(cloudProfile.weight_kg),
+            age: Number(cloudProfile.age),
+            maxHr: Number(cloudProfile.max_hr)
+          };
+          const { data: completions, error: completionError } = await supabaseClient
+            .from("workout_completions")
+            .select("week_index,workout_index")
+            .eq("user_id", user.id);
+          if (completionError) throw completionError;
+          saved = Object.fromEntries((completions || []).map((row) => [`${row.week_index}-${row.workout_index}`, true]));
+        } else {
+          if (isCompleteProfile(profile)) await saveCloudProfile();
+          const guestCompletions = localCompletionRows(user.id);
+          if (guestCompletions.length) {
+            const { error: completionError } = await supabaseClient.from("workout_completions").upsert(guestCompletions);
+            if (completionError) throw completionError;
+          }
+        }
+        ftp = Number(profile?.currentFtp) || 0;
+        persist();
+        renderProfile();
+        renderZones();
+        renderWeek();
+        renderAccountUI("Synced. Your profile and ride checkoffs are saved to this account.");
+      } catch (error) {
+        accountSyncId = null;
+        renderAccountUI(`Cloud sync failed: ${error.message}`);
+      }
+    }
+    function clearSignedInData() {
+      accountUser = null;
+      accountSyncId = null;
+      profile = null;
+      saved = {};
+      ftp = 0;
+      try {
+        localStorage.removeItem(storageKey);
+        localStorage.removeItem(profileStorageKey);
+      } catch {}
+      renderProfile();
+      renderZones();
+      renderWeek();
+      renderAccountUI();
+    }
+    async function authenticate(mode) {
+      if (!supabaseClient) return;
+      const emailInput = document.querySelector("#account-email");
+      const passwordInput = document.querySelector("#account-password");
+      if (!emailInput.reportValidity() || !passwordInput.reportValidity()) return;
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      const buttons = [document.querySelector("#sign-in"), document.querySelector("#create-account")];
+      buttons.forEach((button) => { button.disabled = true; });
+      renderAccountUI(mode === "signup" ? "Creating your account…" : "Signing in…");
+      try {
+        const response = mode === "signup"
+          ? await supabaseClient.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}${window.location.pathname}` } })
+          : await supabaseClient.auth.signInWithPassword({ email, password });
+        if (response.error) throw response.error;
+        if (response.data.session) {
+          await loadAccountData(response.data.session.user);
+          showToast("Account synced on this device.");
+        } else {
+          renderAccountUI("Check your email to confirm the account, then sign in here.");
+        }
+      } catch (error) {
+        renderAccountUI(error.message || "Sign-in failed. Check your email and password.");
+      } finally {
+        buttons.forEach((button) => { button.disabled = false; });
+      }
+    }
+    function renderProfile() {
+      const currentFtp = Number(profile?.currentFtp) || null;
+      const targetFtp = Number(profile?.targetFtp) || null;
+      const weight = Number(profile?.weightKg) || null;
+      const display = (value) => value === null ? "—" : String(value);
+      document.querySelector("#ftp-value").textContent = display(currentFtp);
+      document.querySelector("#target-ftp-value").textContent = display(targetFtp);
+      document.querySelector("#weight-value").textContent = display(weight);
+      document.querySelector("#age-value").textContent = display(Number(profile?.age) || null);
+      document.querySelector("#max-hr-value").textContent = display(Number(profile?.maxHr) || null);
+      document.querySelector("#zone-max-hr").textContent = display(Number(profile?.maxHr) || null);
+      document.querySelector("#current-wkg").textContent = currentFtp && weight ? (currentFtp / weight).toFixed(2) : "—";
+      document.querySelector("#target-wkg").textContent = targetFtp && weight ? (targetFtp / weight).toFixed(2) : "—";
+      document.querySelector("#goal-gain").textContent = currentFtp && targetFtp ? `${targetFtp - currentFtp > 0 ? "+" : ""}${targetFtp - currentFtp} W · ${Math.round((targetFtp / currentFtp - 1) * 100)}% goal` : "set your goal";
+      document.querySelector("#goal-headline").textContent = targetFtp ? `${targetFtp} watts.` : "your goal.";
+      document.querySelector("#hero-copy").innerHTML = currentFtp && targetFtp && weight
+        ? `A progressive indoor cycling block built around Zwift workouts. From <strong>${currentFtp} W to a ${targetFtp} W goal</strong> for a ${weight} kg rider: a meaningful jump, earned one repeatable week at a time.`
+        : "Add a rider profile to personalize FTP targets, power zones, and your training progress.";
+    }
     function renderZones() {
       const zones = [["Recovery", "Very easy", .01, .55], ["Endurance", "All-day pace", .56, .75], ["Tempo", "Steady", .76, .90], ["Sweet spot", "Strong / controlled", .88, .94], ["Threshold", "Hard / sustainable", .95, 1.05], ["VO₂max", "Very hard", 1.06, 1.20]];
-      document.querySelector("#zone-rows").innerHTML = zones.map(([name, effort, low, high]) => `<tr class="zone-row"><td><span class="zone-swatch"></span>${name}</td><td>${effort}</td><td>${Math.round(ftp * low)}–${Math.round(ftp * high)} W</td></tr>`).join("");
-      document.querySelector("#ftp-value").textContent = ftp;
-      document.querySelector("#current-wkg").textContent = (ftp / 82).toFixed(2);
+      document.querySelector("#zone-rows").innerHTML = zones.map(([name, effort, low, high]) => `<tr class="zone-row"><td><span class="zone-swatch"></span>${name}</td><td>${effort}</td><td>${ftp ? `${Math.round(ftp * low)}–${Math.round(ftp * high)} W` : "—"}</td></tr>`).join("");
     }
     function renderWeek() {
       const week = weeks[currentWeek];
@@ -464,6 +660,15 @@
         if (saved[key]) delete saved[key]; else saved[key] = true;
         persist();
         renderWeek();
+        if (accountUser && supabaseClient) {
+          const [weekIndex, workoutIndex] = key.split("-").map(Number);
+          const query = saved[key]
+            ? supabaseClient.from("workout_completions").upsert({ user_id: accountUser.id, week_index: weekIndex, workout_index: workoutIndex })
+            : supabaseClient.from("workout_completions").delete().eq("user_id", accountUser.id).eq("week_index", weekIndex).eq("workout_index", workoutIndex);
+          query.then(({ error }) => {
+            if (error) showToast(`Saved here, but cloud sync failed: ${error.message}`);
+          });
+        }
       }));
     }
     function renderTabs() {
@@ -488,21 +693,69 @@
       setTheme(theme);
     });
     document.querySelector("#print-plan").addEventListener("click", () => window.print());
-    const ftpDialog = document.querySelector("#ftp-dialog");
-    document.querySelector("#edit-ftp").addEventListener("click", () => { document.querySelector("#ftp-input").value = ftp; ftpDialog.showModal(); });
-    document.querySelector("#ftp-form").addEventListener("submit", (event) => {
-      if (event.submitter?.value !== "save") return;
-      const nextFTP = Number(document.querySelector("#ftp-input").value);
-      if (!Number.isFinite(nextFTP) || nextFTP < 80 || nextFTP > 500) { event.preventDefault(); showToast("Enter an FTP between 80 and 500 watts."); return; }
-      ftp = nextFTP;
+    const profileDialog = document.querySelector("#profile-dialog");
+    function openProfileDialog() {
+      document.querySelector("#profile-current-ftp").value = profile?.currentFtp || "";
+      document.querySelector("#profile-target-ftp").value = profile?.targetFtp || "";
+      document.querySelector("#profile-weight").value = profile?.weightKg || "";
+      document.querySelector("#profile-age").value = profile?.age || "";
+      document.querySelector("#profile-max-hr").value = profile?.maxHr || "";
+      profileDialog.showModal();
+    }
+    document.querySelector("#account-button").addEventListener("click", openProfileDialog);
+    document.querySelector("#edit-profile").addEventListener("click", openProfileDialog);
+    document.querySelector("#cancel-profile").addEventListener("click", () => profileDialog.close());
+    document.querySelector("#profile-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      profile = {
+        currentFtp: Number(document.querySelector("#profile-current-ftp").value),
+        targetFtp: Number(document.querySelector("#profile-target-ftp").value),
+        weightKg: Number(document.querySelector("#profile-weight").value),
+        age: Number(document.querySelector("#profile-age").value),
+        maxHr: Number(document.querySelector("#profile-max-hr").value)
+      };
+      ftp = profile.currentFtp;
       persist();
+      renderProfile();
       renderZones();
-      showToast("Power zones updated. Remember to update Zwift too.");
+      profileDialog.close();
+      if (accountUser) {
+        saveCloudProfile().then(() => {
+          renderAccountUI("Profile synced to your account.");
+          showToast("Rider profile synced.");
+        }).catch((error) => {
+          renderAccountUI(`Saved on this device, but cloud sync failed: ${error.message}`);
+        });
+      } else {
+        showToast("Rider profile saved in this browser.");
+      }
+    });
+    document.querySelector("#sign-in").addEventListener("click", () => authenticate("signin"));
+    document.querySelector("#create-account").addEventListener("click", () => authenticate("signup"));
+    document.querySelector("#sign-out").addEventListener("click", async () => {
+      if (!supabaseClient) return;
+      const { error } = await supabaseClient.auth.signOut();
+      if (error) {
+        renderAccountUI(`Sign-out failed: ${error.message}`);
+        return;
+      }
+      clearSignedInData();
+      showToast("Signed out. Account data remains in the cloud.");
     });
     renderTabs();
+    renderProfile();
     renderZones();
     renderWeek();
+    renderAccountUI();
     setTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
+    if (supabaseClient) {
+      supabaseClient.auth.onAuthStateChange((_event, session) => {
+        setTimeout(() => {
+          if (session?.user) void loadAccountData(session.user);
+          else if (accountUser) clearSignedInData();
+        }, 0);
+      });
+    }
   </script>
 </body>
 </html>
