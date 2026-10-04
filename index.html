@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f2f0e8">
+  <script>
+    try { if (localStorage.getItem("ftp250-theme") === "dark") document.documentElement.dataset.theme = "dark"; } catch {}
+  </script>
   <title>FTP 250 | Zwift training plan</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,8 +23,46 @@
       --blue: #91b8ba;
       --green: #527468;
       --white: #fffefa;
+      --soft-surface: #e8e6dc;
+      --soft-text: #555950;
+      --hero-copy: #555950;
+      --done-surface: #eef0e9;
+      --track: #deded4;
+      --hover-surface: #fffefa;
+      --selected-bg: #20231f;
+      --selected-text: #fffefa;
+      --primary-bg: #20231f;
+      --primary-text: #fffefa;
+      --toast-bg: #20231f;
+      --toast-text: #fffefa;
+      --complete-mark: #fffefa;
       --display: "Barlow Condensed", Impact, sans-serif;
       --body: "DM Sans", sans-serif;
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --paper: #171b19;
+      --ink: #f1f1e9;
+      --muted: #a9aea5;
+      --line: #3b423d;
+      --red: #ff8066;
+      --yellow: #e9cf62;
+      --blue: #91b8ba;
+      --green: #a4c6b7;
+      --white: #252b28;
+      --soft-surface: #202623;
+      --soft-text: #c0c5bc;
+      --hero-copy: #d0d4cc;
+      --done-surface: #26342e;
+      --track: #3b423d;
+      --hover-surface: #303834;
+      --selected-bg: #e7e6df;
+      --selected-text: #20231f;
+      --primary-bg: #e7e6df;
+      --primary-text: #20231f;
+      --toast-bg: #090c0b;
+      --toast-text: #f1f1e9;
+      --complete-mark: #171b19;
     }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); }
@@ -35,14 +76,17 @@
     .top-actions { display: flex; align-items: center; gap: 20px; }
     .quiet-link { color: var(--muted); text-decoration: none; font-size: 12px; font-weight: 700; }
     .print-button { display: inline-flex; gap: 8px; align-items: center; border: 1px solid var(--line); background: transparent; padding: 9px 13px; border-radius: 3px; font-size: 12px; font-weight: 700; cursor: pointer; }
-    .print-button:hover { background: var(--white); }
+    .print-button:hover { background: var(--hover-surface); }
+    .theme-button { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 3px; background: transparent; color: var(--ink); font-size: 19px; cursor: pointer; }
+    .theme-button:hover { background: var(--hover-surface); }
+    .theme-button:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
     .hero { min-height: 360px; position: relative; display: grid; grid-template-columns: 1.1fr .9fr; align-items: center; gap: 36px; padding: 46px 0 38px; }
     .hero-copy { position: relative; z-index: 1; max-width: 700px; }
     .eyebrow { display: flex; gap: 10px; align-items: center; color: var(--green); text-transform: uppercase; letter-spacing: 1.4px; font-size: 10px; font-weight: 700; }
     .eyebrow::before { content: ""; width: 24px; height: 2px; background: var(--red); }
     h1 { margin: 12px 0 0; font: 900 clamp(64px, 8vw, 112px)/.82 var(--display); letter-spacing: 0; text-transform: uppercase; }
     h1 span { display: block; color: var(--red); }
-    .hero-sub { max-width: 510px; margin: 20px 0 0; color: #555950; font-size: 14px; line-height: 1.65; }
+    .hero-sub { max-width: 510px; margin: 20px 0 0; color: var(--hero-copy); font-size: 14px; line-height: 1.65; }
     .hero-sub strong { color: var(--ink); }
     .hero-image { align-self: stretch; min-height: 270px; position: relative; background: #39413d url("https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=1600&q=85") center 48%/cover no-repeat; }
     .hero-image::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(19,25,23,.08), rgba(19,25,23,.18)); }
@@ -64,7 +108,7 @@
     .phase-number { color: var(--red); font: 700 16px var(--display); }
     .phase-name { font-size: 11px; font-weight: 700; }
     .phase-weeks { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; font-weight: 500; }
-    .coach-note { margin-top: 25px; padding: 15px; border-left: 3px solid var(--yellow); background: #e9e6dc; font-size: 10px; line-height: 1.6; }
+    .coach-note { margin-top: 25px; padding: 15px; border-left: 3px solid var(--yellow); background: var(--soft-surface); font-size: 10px; line-height: 1.6; }
     .coach-note strong { display: block; margin-bottom: 4px; font-size: 10px; text-transform: uppercase; letter-spacing: .6px; }
     .plan-main { min-width: 0; }
     .section-top { display: flex; align-items: end; justify-content: space-between; gap: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--ink); }
@@ -77,14 +121,14 @@
     .week-tabs { display: grid; grid-template-columns: repeat(12, 1fr); gap: 5px; padding: 15px 0 19px; }
     .week-tab { aspect-ratio: 1; min-width: 0; border: 1px solid var(--line); border-radius: 2px; background: transparent; color: var(--muted); font-size: 10px; font-weight: 700; cursor: pointer; }
     .week-tab:hover { border-color: var(--ink); color: var(--ink); }
-    .week-tab[aria-current="true"] { border-color: var(--ink); background: var(--ink); color: var(--white); }
+    .week-tab[aria-current="true"] { border-color: var(--selected-bg); background: var(--selected-bg); color: var(--selected-text); }
     .week-tab.is-test:not([aria-current="true"]) { box-shadow: inset 0 -3px var(--yellow); }
-    .week-summary { display: flex; flex-wrap: wrap; gap: 9px 22px; padding: 12px 14px; background: #e8e6dc; color: #555950; font-size: 10px; }
+    .week-summary { display: flex; flex-wrap: wrap; gap: 9px 22px; padding: 12px 14px; background: var(--soft-surface); color: var(--soft-text); font-size: 10px; }
     .week-summary strong { color: var(--ink); }
     .workout-list { display: grid; gap: 9px; padding-top: 14px; }
     .workout { position: relative; display: grid; grid-template-columns: 70px minmax(0, 1fr) auto; gap: 15px; align-items: center; padding: 17px 17px; border: 1px solid var(--line); background: var(--white); transition: border-color .18s ease, transform .18s ease; }
     .workout:hover { border-color: #a9aaa0; transform: translateY(-1px); }
-    .workout.is-complete { background: #eef0e9; }
+    .workout.is-complete { background: var(--done-surface); }
     .workout.optional { background: transparent; }
     .day { font: 700 15px var(--display); text-transform: uppercase; }
     .day span { display: block; margin-top: 4px; color: var(--muted); font: 600 9px var(--body); text-transform: none; }
@@ -104,9 +148,9 @@
     .workout > :not(.complete-button) { pointer-events: none; }
     .complete-mark { position: absolute; top: 11px; right: 11px; width: 16px; height: 16px; border: 1px solid #b6b8ae; border-radius: 50%; background: var(--white); }
     .workout.is-complete .complete-mark { border-color: var(--green); background: var(--green); }
-    .workout.is-complete .complete-mark::after { content: "✓"; position: absolute; inset: -1px 0 0; color: white; text-align: center; font-size: 11px; }
+    .workout.is-complete .complete-mark::after { content: "✓"; position: absolute; inset: -1px 0 0; color: var(--complete-mark); text-align: center; font-size: 11px; }
     .week-footer { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-top: 13px; color: var(--muted); font-size: 10px; }
-    .progress-track { width: 135px; height: 4px; background: #deded4; }
+    .progress-track { width: 135px; height: 4px; background: var(--track); }
     .progress-fill { width: 0; height: 100%; background: var(--red); transition: width .2s ease; }
     .zones { display: grid; grid-template-columns: 1fr 1fr; gap: 46px; margin-top: 58px; padding: 27px 0; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
     .zones h3 { margin: 0; font: 800 27px/.9 var(--display); text-transform: uppercase; }
@@ -123,7 +167,7 @@
     .fine-print { display: flex; justify-content: space-between; gap: 32px; padding-top: 21px; color: var(--muted); font-size: 9px; line-height: 1.6; }
     .fine-print p { max-width: 680px; margin: 0; }
     .fine-print a { color: var(--green); font-weight: 700; text-decoration-thickness: 1px; text-underline-offset: 2px; }
-    .toast { position: fixed; z-index: 5; right: 20px; bottom: 20px; padding: 12px 16px; background: var(--ink); color: white; font-size: 12px; box-shadow: 0 5px 20px #20231f22; }
+    .toast { position: fixed; z-index: 5; right: 20px; bottom: 20px; padding: 12px 16px; background: var(--toast-bg); color: var(--toast-text); font-size: 12px; box-shadow: 0 5px 20px #20231f22; }
     .toast[hidden] { display: none; }
     dialog { width: min(360px, calc(100% - 32px)); border: 1px solid var(--ink); border-radius: 3px; padding: 22px; background: var(--white); color: var(--ink); box-shadow: 0 20px 80px #20231f33; }
     dialog::backdrop { background: #20231f88; }
@@ -133,7 +177,7 @@
     .ftp-field input { width: 100%; padding: 11px; border: 1px solid var(--line); border-radius: 2px; font-weight: 700; }
     .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; }
     .dialog-actions button { border: 1px solid var(--line); border-radius: 2px; background: transparent; padding: 9px 13px; font-size: 11px; font-weight: 700; cursor: pointer; }
-    .dialog-actions button:last-child { border-color: var(--ink); background: var(--ink); color: white; }
+    .dialog-actions button:last-child { border-color: var(--primary-bg); background: var(--primary-bg); color: var(--primary-text); }
     @media (max-width: 800px) {
       .shell { padding: 0 24px 50px; }
       .hero { min-height: 325px; grid-template-columns: 1fr .7fr; gap: 18px; }
@@ -192,6 +236,7 @@
       <nav class="top-actions" aria-label="Page actions">
         <a class="quiet-link" href="#plan">THE PLAN</a>
         <a class="quiet-link" href="#zones">POWER ZONES</a>
+        <button class="theme-button" id="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode" aria-pressed="false"><span id="theme-icon" aria-hidden="true">☾</span></button>
         <button class="print-button" id="print-plan" type="button" aria-label="Print plan"><span aria-hidden="true">↗</span> PRINT</button>
       </nav>
     </header>
@@ -427,6 +472,21 @@
     }
     document.querySelector("#prev-week").addEventListener("click", () => { if (currentWeek > 0) { currentWeek--; renderWeek(); } });
     document.querySelector("#next-week").addEventListener("click", () => { if (currentWeek < weeks.length - 1) { currentWeek++; renderWeek(); } });
+    const themeToggle = document.querySelector("#theme-toggle");
+    function setTheme(theme) {
+      const isDark = theme === "dark";
+      document.documentElement.dataset.theme = isDark ? "dark" : "light";
+      document.querySelector('meta[name="theme-color"]').content = isDark ? "#171b19" : "#f2f0e8";
+      themeToggle.setAttribute("aria-pressed", String(isDark));
+      themeToggle.setAttribute("aria-label", `Switch to ${isDark ? "light" : "dark"} mode`);
+      themeToggle.title = `Switch to ${isDark ? "light" : "dark"} mode`;
+      document.querySelector("#theme-icon").textContent = isDark ? "☼" : "☾";
+    }
+    themeToggle.addEventListener("click", () => {
+      const theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      try { localStorage.setItem("ftp250-theme", theme); } catch {}
+      setTheme(theme);
+    });
     document.querySelector("#print-plan").addEventListener("click", () => window.print());
     const ftpDialog = document.querySelector("#ftp-dialog");
     document.querySelector("#edit-ftp").addEventListener("click", () => { document.querySelector("#ftp-input").value = ftp; ftpDialog.showModal(); });
@@ -442,6 +502,7 @@
     renderTabs();
     renderZones();
     renderWeek();
+    setTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
   </script>
 </body>
 </html>
