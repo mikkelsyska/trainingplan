@@ -514,11 +514,29 @@
       "Recovery": "https://whatsonzwift.com/workouts/recovery",
       "Ramp Test / FTP test": "https://whatsonzwift.com/workouts/ftp-tests"
     };
+    const realZwiftWorkoutDurations = {
+      "SST (Short)": "45 min",
+      "SST (Med)": "60 min",
+      "SST (Long)": "75 min",
+      "FTP Intervals": "60 min",
+      "2 × 15 FTP Intervals": "65 min",
+      "2 × 20 FTP Intervals": "75 min",
+      "The Gorby": "45 min",
+      "Endurance / Zone 2": "60 min",
+      "Recovery": "30 min",
+      "Ramp Test / FTP test": "45 min",
+      "Off-bike recovery": "Rest"
+    };
     const zwiftRoutes = {
       flat: { name: "Tempus Fugit", details: "Watopia · 17.2 km · 26 m", href: "https://whatsonzwift.com/world/watopia/route/tempus-fugit" },
       endurance: { name: "Big Flat 8", details: "Watopia · 29.2 km · 103 m", href: "https://whatsonzwift.com/world/watopia/route/big-flat-8" },
       recovery: { name: "Volcano Flat", details: "Watopia · 12.3 km · 50 m", href: "https://whatsonzwift.com/world/watopia/route/volcano-flat" }
     };
+
+    function actualWorkoutDuration(zwift, duration) {
+      if (realZwiftWorkoutDurations[zwift]) return realZwiftWorkoutDurations[zwift];
+      return duration;
+    }
 
     function routeForWorkout(zwift, duration) {
       if (zwift === "Off-bike recovery") return null;
@@ -561,7 +579,10 @@
       return (Number(match[1]) + Number(match[2] || match[1])) / 2;
     }
     function durationForRides(rides) {
-      return rides.reduce((total, ride) => total + estimatedMinutes(ride[4]), 0);
+      return rides.reduce((total, ride) => {
+        const [, , zwift, , plannedDuration] = ride;
+        return total + estimatedMinutes(actualWorkoutDuration(zwift, plannedDuration));
+      }, 0);
     }
     function formatHours(minutes) {
       const hours = Math.floor(minutes / 60);
@@ -817,16 +838,17 @@
       document.querySelectorAll(".week-tab").forEach((tab, index) => tab.setAttribute("aria-current", String(index === currentWeek)));
       workoutList.innerHTML = displayedRides.map((ride, index) => {
         const [, title, zwift, description, duration, intensity] = ride;
+        const actualDuration = actualWorkoutDuration(zwift, duration);
         const key = `${currentWeek}-${index}`;
         const completed = Boolean(saved[key]);
         const isRestDay = zwift === "Off-bike recovery";
         const optional = index === 3 && hasOptionalRide;
-        const route = routeForWorkout(zwift, duration);
+        const route = routeForWorkout(zwift, actualDuration);
         const wattTarget = wattTargetFor(description);
         return `<article class="workout${completed ? " is-complete" : ""}${optional ? " optional" : ""}${isRestDay ? " rest-day" : ""}">
           <div class="day">${trainingDays[index]}<span>${isRestDay ? "rest day" : optional ? "optional" : "key ride"}</span></div>
           <div class="workout-copy"><div class="workout-title">${title}</div>${zwiftWorkoutLinks[zwift] ? `<a class="zwift-name" href="${zwiftWorkoutLinks[zwift]}" target="_blank" rel="noopener noreferrer" aria-label="View ${zwift} on What's on Zwift">ZWIFT · ${zwift} ↗</a>` : `<span class="zwift-name">ZWIFT · ${zwift}</span>`}${route ? `<div class="route-suggestion">ROUTE · <a class="route-link" href="${route.href}" target="_blank" rel="noopener noreferrer" aria-label="View the ${route.name} route details on What's on Zwift">${route.name} ↗</a><span>${route.details}</span></div>` : `<div class="route-suggestion">ROUTE · Rest day, no ride recommended</div>`}${wattTarget ? `<div class="power-target">${wattTarget}</div>` : ""}<div class="workout-desc">${description}</div></div>
-          <div class="workout-dose"><span class="duration">${duration}</span><span class="intensity">${intensity}</span></div>
+          <div class="workout-dose"><span class="duration">${actualDuration}</span><span class="intensity">${intensity}</span></div>
           <span class="complete-mark" aria-hidden="true"></span><button class="complete-button" type="button" aria-label="Mark ${trainingDays[index]} ${title} ${completed ? "incomplete" : "complete"}" aria-pressed="${completed}"></button>
         </article>`;
       }).join("");
