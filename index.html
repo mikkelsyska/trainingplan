@@ -522,10 +522,7 @@
       "2 × 15 FTP Intervals": "65 min",
       "2 × 20 FTP Intervals": "75 min",
       "The Gorby": "45 min",
-      "Endurance / Zone 2": "60 min",
-      "Recovery": "30 min",
-      "Ramp Test / FTP test": "45 min",
-      "Off-bike recovery": "Rest"
+      "Ramp Test / FTP test": "45 min"
     };
     const zwiftRoutes = {
       flat: { name: "Tempus Fugit", details: "Watopia · 17.2 km · 26 m", href: "https://whatsonzwift.com/world/watopia/route/tempus-fugit" },
@@ -536,6 +533,10 @@
     function actualWorkoutDuration(zwift, duration) {
       if (realZwiftWorkoutDurations[zwift]) return realZwiftWorkoutDurations[zwift];
       return duration;
+    }
+
+    function isManualRide(zwift) {
+      return !realZwiftWorkoutDurations[zwift] && zwift !== "Off-bike recovery";
     }
 
     function routeForWorkout(zwift, duration) {
@@ -843,11 +844,12 @@
         const completed = Boolean(saved[key]);
         const isRestDay = zwift === "Off-bike recovery";
         const optional = index === 3 && hasOptionalRide;
+        const manualRide = isManualRide(zwift);
         const route = routeForWorkout(zwift, actualDuration);
         const wattTarget = wattTargetFor(description);
         return `<article class="workout${completed ? " is-complete" : ""}${optional ? " optional" : ""}${isRestDay ? " rest-day" : ""}">
           <div class="day">${trainingDays[index]}<span>${isRestDay ? "rest day" : optional ? "optional" : "key ride"}</span></div>
-          <div class="workout-copy"><div class="workout-title">${title}</div>${zwiftWorkoutLinks[zwift] ? `<a class="zwift-name" href="${zwiftWorkoutLinks[zwift]}" target="_blank" rel="noopener noreferrer" aria-label="View ${zwift} on What's on Zwift">ZWIFT · ${zwift} ↗</a>` : `<span class="zwift-name">ZWIFT · ${zwift}</span>`}${route ? `<div class="route-suggestion">ROUTE · <a class="route-link" href="${route.href}" target="_blank" rel="noopener noreferrer" aria-label="View the ${route.name} route details on What's on Zwift">${route.name} ↗</a><span>${route.details}</span></div>` : `<div class="route-suggestion">ROUTE · Rest day, no ride recommended</div>`}${wattTarget ? `<div class="power-target">${wattTarget}</div>` : ""}<div class="workout-desc">${description}</div></div>
+          <div class="workout-copy"><div class="workout-title">${title}</div>${zwiftWorkoutLinks[zwift] ? `<a class="zwift-name" href="${zwiftWorkoutLinks[zwift]}" target="_blank" rel="noopener noreferrer" aria-label="View ${zwift} on What's on Zwift">ZWIFT · ${zwift} ↗</a>` : `<span class="zwift-name">ZWIFT · ${zwift}</span>`}${manualRide ? `<div class="route-suggestion">ROUTE · Manual Zwift ride · keep the planned duration in Zwift</div>` : route ? `<div class="route-suggestion">ROUTE · <a class="route-link" href="${route.href}" target="_blank" rel="noopener noreferrer" aria-label="View the ${route.name} route details on What's on Zwift">${route.name} ↗</a><span>${route.details}</span></div>` : `<div class="route-suggestion">ROUTE · Rest day, no ride recommended</div>`}${wattTarget ? `<div class="power-target">${wattTarget}</div>` : ""}<div class="workout-desc">${description}</div></div>
           <div class="workout-dose"><span class="duration">${actualDuration}</span><span class="intensity">${intensity}</span></div>
           <span class="complete-mark" aria-hidden="true"></span><button class="complete-button" type="button" aria-label="Mark ${trainingDays[index]} ${title} ${completed ? "incomplete" : "complete"}" aria-pressed="${completed}"></button>
         </article>`;
