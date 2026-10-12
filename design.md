@@ -25,18 +25,21 @@ The profile editor collects:
 - Age
 - Maximum heart rate in bpm
 - Weekly training availability in hours
-- Three or four available training days
+- Four or five available cycling days, including Wednesday
 
 The page derives current and goal W/kg, goal change, power zones, workout watt guidance, and the hero description from these values. Updating profile settings refreshes the visible plan values.
 
 ### Weekly Plan
 
 - Present a 12-week plan in three phases: base, build, and sharpen/test.
-- Provide three key sessions per week and an optional fourth recovery ride.
+- Provide cycling-focused strength sessions Monday and Friday, three key cycling sessions, and an easy Wednesday Zone 2 ride each week; an optional fifth cycling day can add recovery.
+- Let strength cards open an in-page exercise guide with an image, sets/reps, setup and movement cues, and common form cautions. Friday's guide emphasizes low fatigue before the Saturday ride.
 - Retain deload and FTP test checkpoints in weeks 4, 8, and 12.
-- Use a rider's selected days for the key sessions, in calendar order. The first three selected days must leave at least one rest day between key sessions.
-- Use a fourth selected day for recovery only when that session fits the weekly-hour budget.
-- Calculate scheduled weekly volume from the rides shown. If the three key sessions exceed the rider's availability, show a warning; do not silently remove or compress key workouts.
+- Monday has a 25-minute controlled cycling-strength session; Friday has a 20-minute low-fatigue session before Saturday riding.
+- Reserve Wednesday for a 30–45 minute Zone 2 ride at 60–70% FTP.
+- Use three selected non-Wednesday, non-strength days for key cycling sessions, in calendar order. Leave at least one rest day between key sessions.
+- Include optional recovery on a fifth selected cycling day only when it fits the weekly-hour budget.
+- Calculate scheduled weekly volume from strength, key rides, and Wednesday Zone 2. If core sessions exceed the rider's availability, show a warning; do not silently remove or compress workouts.
 - Keep workout prescriptions expressed relative to FTP. Where an interval range is stated as a percentage of FTP, also show its approximate watt range using the current FTP. The rider must still update FTP in Zwift separately.
 - Link Zwift workouts and suggested routes to the external What's on Zwift catalog. Rest days must not recommend a route.
 - Let riders select a week, mark workouts complete, and review weekly progress.
@@ -62,7 +65,7 @@ Guest profile data is stored in browser local storage. Authenticated profile dat
 | `age` | Rider age |
 | `max_hr` | Reported maximum heart rate, shown as context only |
 | `weekly_hours` | Available training time per week |
-| `training_days` | Three or four available weekdays |
+| `training_days` | Four or five available cycling days, including Wednesday; Monday and Friday strength are fixed |
 
 ### FTP Tests
 
@@ -78,6 +81,7 @@ The selected display theme is a local device preference and is not synced as rid
 
 - The frontend is a static HTML/CSS/JavaScript page hosted by GitHub Pages; no build step is required.
 - Supabase JS is loaded as a browser client. `supabase-config.js` contains only the project URL and publishable/anon key.
+- Strength exercise images are loaded from the public-domain Free Exercise DB and credited in the detail dialog.
 - Supabase Auth provides email/password accounts. The client reads and writes each user's profile, FTP history, and workout completions.
 - `supabase-schema.sql` defines the tables, constraints, grants, and row-level security policies.
 - Test mode uses separate local-storage keys and disables Supabase connections so regression tests cannot read or overwrite guest data.

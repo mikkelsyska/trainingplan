@@ -6,24 +6,43 @@ create table if not exists public.training_profiles (
   age smallint not null check (age between 16 and 100),
   max_hr smallint not null check (max_hr between 100 and 240),
   weekly_hours numeric(3, 1) not null default 5 check (weekly_hours between 2 and 16),
-  training_days text[] not null default array['Tue', 'Thu', 'Sat', 'Sun']::text[]
-    check (cardinality(training_days) between 3 and 4 and training_days <@ array['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']::text[]),
+  training_days text[] not null default array['Tue', 'Wed', 'Thu', 'Sat']::text[],
   updated_at timestamptz not null default now()
 );
 
 alter table public.training_profiles
   add column if not exists weekly_hours numeric(3, 1) not null default 5 check (weekly_hours between 2 and 16);
 alter table public.training_profiles
-  add column if not exists training_days text[] not null default array['Tue', 'Thu', 'Sat', 'Sun']::text[]
-    check (cardinality(training_days) between 3 and 4 and training_days <@ array['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']::text[]);
+  add column if not exists training_days text[] not null default array['Tue', 'Wed', 'Thu', 'Sat']::text[];
+alter table public.training_profiles
+  alter column training_days set default array['Tue', 'Wed', 'Thu', 'Sat']::text[];
+alter table public.training_profiles
+  drop constraint if exists training_profiles_training_days_check;
+alter table public.training_profiles
+  drop constraint if exists training_profiles_training_days_valid_check;
+update public.training_profiles
+  set training_days = array['Wed']::text[] || array_remove(training_days, 'Wed')
+  where not ('Wed' = any(training_days));
+alter table public.training_profiles
+  add constraint training_profiles_training_days_valid_check
+  check (
+    cardinality(training_days) between 4 and 5
+    and 'Wed' = any(training_days)
+    and training_days <@ array['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']::text[]
+  );
 
 create table if not exists public.workout_completions (
   user_id uuid not null references auth.users(id) on delete cascade,
   week_index smallint not null check (week_index between 0 and 11),
-  workout_index smallint not null check (workout_index between 0 and 3),
+  workout_index smallint not null check (workout_index between 0 and 6),
   completed_at timestamptz not null default now(),
   primary key (user_id, week_index, workout_index)
 );
+
+alter table public.workout_completions
+  drop constraint if exists workout_completions_workout_index_check;
+alter table public.workout_completions
+  add constraint workout_completions_workout_index_check check (workout_index between 0 and 6);
 
 create table if not exists public.ftp_tests (
   user_id uuid not null references auth.users(id) on delete cascade,

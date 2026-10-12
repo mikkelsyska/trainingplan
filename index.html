@@ -133,6 +133,14 @@
     .workout:hover { border-color: #a9aaa0; transform: translateY(-1px); }
     .workout.is-complete { background: var(--done-surface); }
     .workout.optional { background: transparent; }
+    .workout.strength-session { grid-template-columns: 58px minmax(0, 1fr); align-items: start; padding: 14px 17px; border-left: 4px solid var(--green); background: var(--soft-surface); }
+    .strength-session .workout-copy { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; column-gap: 12px; }
+    .strength-session .strength-type { grid-column: 1 / -1; margin-bottom: 4px; color: var(--green); font-size: 8px; font-weight: 700; }
+    .strength-session .workout-title { align-self: center; }
+    .strength-session .zwift-name { justify-self: end; margin-top: 0; }
+    .strength-session .route-suggestion, .strength-session .workout-desc { grid-column: 1 / -1; }
+    .strength-session .workout-dose { grid-column: 2; display: flex; align-items: baseline; gap: 9px; min-width: 0; margin-top: 9px; text-align: left; }
+    .strength-session .intensity { margin-top: 0; }
     .day { font: 700 15px var(--display); text-transform: uppercase; }
     .day span { display: block; margin-top: 4px; color: var(--muted); font: 600 9px var(--body); text-transform: none; }
     .workout-copy { min-width: 0; }
@@ -209,6 +217,21 @@
     .ftp-history-empty { color: var(--muted); font-size: 11px; }
     .budget-warning { margin-top: 10px; padding: 10px 12px; border-left: 3px solid var(--yellow); background: var(--soft-surface); color: var(--soft-text); font-size: 10px; line-height: 1.5; }
     .power-target { margin-top: 5px; color: var(--ink); font-size: 9px; font-weight: 700; }
+    .exercise-open { position: relative; z-index: 1; margin-top: 7px; border: 1px solid var(--line); border-radius: 2px; padding: 6px 8px; background: transparent; color: var(--green); font-size: 9px; font-weight: 700; cursor: pointer; pointer-events: auto; }
+    .exercise-open:hover { background: var(--soft-surface); }
+    #strength-dialog { width: min(880px, calc(100% - 28px)); max-height: 90vh; overflow-y: auto; }
+    .strength-dialog-head { position: sticky; top: -22px; z-index: 2; display: flex; align-items: start; justify-content: space-between; gap: 16px; margin: -22px -22px 18px; padding: 20px 22px 14px; border-bottom: 1px solid var(--line); background: var(--white); }
+    .strength-dialog-head h2 { margin: 0; font: 800 32px/.95 var(--display); text-transform: uppercase; }
+    .strength-dialog-head p { margin: 5px 0 0; color: var(--muted); font-size: 10px; }
+    .strength-close { flex: none; width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 2px; background: transparent; font-size: 18px; cursor: pointer; }
+    .exercise-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .exercise-detail { display: grid; grid-template-columns: minmax(112px, .8fr) 1.2fr; min-height: 142px; overflow: hidden; border: 1px solid var(--line); background: var(--paper); }
+    .exercise-detail img { width: 100%; height: 100%; min-height: 142px; object-fit: cover; background: var(--soft-surface); }
+    .exercise-detail-copy { padding: 11px; }
+    .exercise-detail-copy h3 { margin: 0; font-size: 12px; }
+    .exercise-prescription { margin: 4px 0 8px; color: var(--green); font-size: 9px; font-weight: 700; }
+    .exercise-detail-copy p { margin: 0 0 6px; color: var(--soft-text); font-size: 9px; line-height: 1.5; }
+    .exercise-image-credit { margin: 14px 0 0; color: var(--muted); font-size: 9px; line-height: 1.5; }
     .auth-panel { margin: 0 0 18px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
     .auth-panel p { margin: 0 0 10px; }
     .auth-fields { display: grid; gap: 9px; }
@@ -253,11 +276,15 @@
       .week-tab { font-size: 9px; }
       .workout { grid-template-columns: 53px minmax(0, 1fr); gap: 10px; padding: 14px 13px; }
       .workout-dose { grid-column: 2; display: flex; gap: 8px; align-items: baseline; text-align: left; }
+      .strength-session .workout-copy { grid-template-columns: minmax(0, 1fr); }
+      .strength-session .zwift-name { justify-self: start; margin-top: 5px; }
       .intensity { margin: 0; }
       .complete-mark { top: 10px; right: 9px; }
       .week-summary { gap: 7px 14px; }
       .zones { grid-template-columns: 1fr; gap: 23px; margin-top: 40px; }
       .fine-print { flex-direction: column; gap: 12px; }
+      .exercise-detail-grid { grid-template-columns: 1fr; }
+      .exercise-detail { grid-template-columns: 120px minmax(0, 1fr); }
       .phase-list { grid-template-columns: 1fr; }
       .phase { border-bottom: 1px solid var(--line); }
     }
@@ -322,7 +349,7 @@
         <aside class="plan-aside">
           <div class="eyebrow">THE APPROACH</div>
           <div class="side-head">Build.<br>Absorb.<br>Test.</div>
-          <p class="side-copy">Three focused rides anchor the week. An easy fourth ride is optional. Hard sessions are separated by recovery so the work can actually land.</p>
+          <p class="side-copy">Three focused rides anchor the week, with an easy Zone 2 session every Wednesday. A fifth day can add optional recovery. Hard sessions stay separated so the work can land.</p>
           <ol class="phase-list">
             <li class="phase"><span class="phase-number">01</span><span class="phase-name">Base & rhythm<span class="phase-weeks">Weeks 1–4 · build, then deload</span></span></li>
             <li class="phase"><span class="phase-number">02</span><span class="phase-name">Raise the ceiling<span class="phase-weeks">Weeks 5–8 · threshold, then deload</span></span></li>
@@ -385,19 +412,27 @@
         <fieldset class="profile-schedule">
           <legend>AVAILABLE TRAINING DAYS</legend>
           <div class="schedule-days">
-            <label class="schedule-day"><input type="checkbox" name="training-day" value="Mon">Mon</label>
+            <label class="schedule-day"><input type="checkbox" name="training-day" value="Mon" disabled>Mon · weights</label>
             <label class="schedule-day"><input type="checkbox" name="training-day" value="Tue" checked>Tue</label>
-            <label class="schedule-day"><input type="checkbox" name="training-day" value="Wed">Wed</label>
+            <label class="schedule-day"><input type="checkbox" name="training-day" value="Wed" checked>Wed · Zone 2</label>
             <label class="schedule-day"><input type="checkbox" name="training-day" value="Thu" checked>Thu</label>
-            <label class="schedule-day"><input type="checkbox" name="training-day" value="Fri">Fri</label>
+            <label class="schedule-day"><input type="checkbox" name="training-day" value="Fri" disabled>Fri · weights</label>
             <label class="schedule-day"><input type="checkbox" name="training-day" value="Sat" checked>Sat</label>
             <label class="schedule-day"><input type="checkbox" name="training-day" value="Sun" checked>Sun</label>
           </div>
-          <span class="schedule-hint" id="schedule-hint">Choose 3 key-ride days; a fourth day enables the optional recovery ride. Allow a rest day between key rides.</span>
+          <span class="schedule-hint" id="schedule-hint">Monday and Friday strength sessions are fixed. Wednesday is Zone 2; choose three or four other days for key rides.</span>
         </fieldset>
       </div>
       <div class="dialog-actions"><button type="button" id="cancel-profile">CANCEL</button><button type="submit">SAVE PROFILE</button></div>
     </form>
+  </dialog>
+  <dialog id="strength-dialog" aria-labelledby="strength-dialog-title">
+    <div class="strength-dialog-head">
+      <div><h2 id="strength-dialog-title">Cycling strength</h2><p id="strength-dialog-subtitle"></p></div>
+      <button class="strength-close" id="close-strength-dialog" type="button" aria-label="Close exercise details">×</button>
+    </div>
+    <div class="exercise-detail-grid" id="exercise-detail-grid"></div>
+    <p class="exercise-image-credit">Exercise photos: <a href="https://github.com/yuhonas/free-exercise-db" target="_blank" rel="noopener noreferrer">Free Exercise DB</a> (Unlicense/public domain). Images show examples; use controlled range and a load you can manage cleanly.</p>
   </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
@@ -500,7 +535,8 @@
     let accountUser = null;
     let accountSyncId = null;
     const trainingDayOrder = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    const defaultTrainingDays = ["Tue", "Thu", "Sat", "Sun"];
+    const defaultTrainingDays = ["Tue", "Wed", "Thu", "Sat"];
+    const fixedStrengthDays = ["Mon", "Fri"];
     const workoutList = document.querySelector("#workout-list");
     const zwiftWorkoutLinks = {
       "SST (Short)": "https://whatsonzwift.com/workouts/less-than-60-minutes-to-burn/sst-short",
@@ -519,9 +555,33 @@
       endurance: { name: "Big Flat 8", details: "Watopia · 29.2 km · 103 m", href: "https://whatsonzwift.com/world/watopia/route/big-flat-8" },
       recovery: { name: "Volcano Flat", details: "Watopia · 12.3 km · 50 m", href: "https://whatsonzwift.com/world/watopia/route/volcano-flat" }
     };
+    const exerciseImageBase = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises";
+    const cyclingStrengthDetails = {
+      Mon: {
+        title: "Foundation strength",
+        subtitle: "25 min · controlled strength · leave 2–3 reps in reserve",
+        exercises: [
+          { name: "Goblet squat", dose: "2 × 6–8", image: "Goblet_Squat", alt: "Goblet squat example", cue: "Hold one weight close to your chest. Sit between your hips with your whole foot grounded; stand by driving evenly through the floor.", avoid: "Do not let your knees cave in or your heels lift." },
+          { name: "Romanian deadlift", dose: "2 × 6–8", image: "Romanian_Deadlift", alt: "Romanian deadlift example", cue: "Keep a soft knee bend and push your hips back. Lower the weight close to your legs until you feel hamstring tension, then stand by bringing the hips forward.", avoid: "Keep your back neutral; stop the lowering before your spine rounds." },
+          { name: "Split squat", dose: "2 × 6 each leg", image: "Smith_Single-Leg_Split_Squat", alt: "Split squat example", cue: "Use a comfortable staggered stance. Lower under control, keep the front foot planted, then drive through that foot to stand.", avoid: "Use bodyweight or light support first; do not chase depth if balance or knee comfort changes." },
+          { name: "Standing calf raise", dose: "2 × 10", image: "Standing_Calf_Raises", alt: "Standing calf raise example", cue: "Rise smoothly onto the balls of your feet, pause briefly, then lower with control through a comfortable range.", avoid: "Avoid bouncing or forcing a deep stretch." },
+          { name: "Dead bug", dose: "2 × 8 each side", image: "Dead_Bug", alt: "Dead bug core exercise example", cue: "Lie on your back and brace gently. Lower the opposite arm and leg only as far as you can keep your lower back steady.", avoid: "Shorten the range if your lower back arches." }
+        ]
+      },
+      Fri: {
+        title: "Pre-ride strength",
+        subtitle: "20 min · light activation · finish fresh for Saturday",
+        exercises: [
+          { name: "Step-up", dose: "2 × 6 each leg", image: "Step-up_with_Knee_Raise", alt: "Step-up exercise example", cue: "Use a low, stable step. Place the whole foot on top, stand through that leg, and lower slowly.", avoid: "Do not push hard off the trailing foot or use a box that forces your hip to tuck." },
+          { name: "Hip thrust", dose: "2 × 8", image: "Barbell_Hip_Thrust", alt: "Hip thrust exercise example", cue: "Brace your trunk and drive through your feet to extend your hips. Pause briefly at the top without over-arching your back.", avoid: "Keep ribs down and stop when hips are extended; do not finish by arching the low back." },
+          { name: "Hamstring curl", dose: "2 × 8", image: "Lying_Leg_Curls", alt: "Lying leg curl exercise example", cue: "Curl the pad toward you smoothly, pause, then lower slowly while keeping your hips settled on the bench.", avoid: "Use a light load and avoid jerking the weight." },
+          { name: "Pallof press", dose: "2 × 8 each side", image: "Pallof_Press", alt: "Pallof press core exercise example", cue: "Stand side-on to a light cable or band. Brace, press your hands straight forward, resist rotation, and return with control.", avoid: "Keep hips and shoulders facing forward; step closer to the anchor if you twist." }
+        ]
+      }
+    };
 
     function routeForWorkout(zwift, duration) {
-      if (zwift === "Off-bike recovery") return null;
+      if (zwift === "Off-bike recovery" || zwift === "Strength training") return null;
       if (zwift === "Recovery") return zwiftRoutes.recovery;
       const durationMinutes = Number.parseInt(duration, 10);
       if (zwift === "Endurance / Zone 2" && durationMinutes >= 90) return zwiftRoutes.endurance;
@@ -546,10 +606,16 @@
       return value && ["currentFtp", "targetFtp", "weightKg", "age", "maxHr"].every((key) => Number.isFinite(Number(value[key])) && Number(value[key]) > 0);
     }
     function getTrainingDays() {
-      const selected = Array.isArray(profile?.trainingDays)
+      const savedDays = Array.isArray(profile?.trainingDays)
         ? trainingDayOrder.filter((day) => profile.trainingDays.includes(day))
         : defaultTrainingDays;
-      return selected.length >= 3 && selected.length <= 4 ? selected : defaultTrainingDays;
+      const selected = savedDays.filter((day) => day !== "Wed" && !fixedStrengthDays.includes(day));
+      while (selected.length < 3) {
+        const nextDefault = defaultTrainingDays.find((day) => day !== "Wed" && !selected.includes(day));
+        const nextAvailable = trainingDayOrder.find((day) => day !== "Wed" && !selected.includes(day));
+        selected.push(nextDefault || nextAvailable);
+      }
+      return trainingDayOrder.filter((day) => day === "Wed" || selected.includes(day)).slice(0, Math.min(5, selected.length + 1));
     }
     function getWeeklyHours() {
       const hours = Number(profile?.weeklyHours);
@@ -562,6 +628,36 @@
     }
     function durationForRides(rides) {
       return rides.reduce((total, ride) => total + estimatedMinutes(ride[4]), 0);
+    }
+    function zone2Ride(week) {
+      const duration = week.test ? 30 : 45;
+      return ["Wed", "Midweek aerobic ride", "Endurance / Zone 2", `${duration} min steady Zone 2 at 60–70% FTP. Keep it conversational and avoid surges so it supports recovery between key sessions.`, `${duration} min`, "Zone 2 · 60–70%"];
+    }
+    function strengthRidesForWeek() {
+      return [
+        {
+          ride: ["Mon", "Foundation strength", "Strength training", "25 min. Goblet squat 2 × 6–8, Romanian deadlift 2 × 6–8, split squat 2 × 6 each leg, calf raise 2 × 10, and dead bug 2 × 8 each side. Use controlled form at RPE 6–7, leaving 2–3 reps in reserve.", "25 min", "Strength · controlled"],
+          day: "Mon",
+          completionIndex: 5,
+          kind: "strength"
+        },
+        {
+          ride: ["Fri", "Pre-ride strength", "Strength training", "20 min low-fatigue session before Saturday's ride. Step-up 2 × 6 each leg, hip thrust 2 × 8, hamstring curl 2 × 8, and Pallof press 2 × 8 each side. Keep the load light, move smoothly, and stop well before fatigue.", "20 min", "Strength · light"],
+          day: "Fri",
+          completionIndex: 6,
+          kind: "strength"
+        }
+      ];
+    }
+    function scheduledRidesForWeek(week) {
+      const selectedDays = getTrainingDays();
+      const keyDays = selectedDays.filter((day) => day !== "Wed").slice(0, 3);
+      const sessions = week.rides.slice(0, 3).map((ride, index) => ({ ride, day: keyDays[index], completionIndex: index, kind: "key" }));
+      sessions.push({ ride: zone2Ride(week), day: "Wed", completionIndex: 4, kind: "zone2" });
+      sessions.push(...strengthRidesForWeek());
+      const optionalDay = selectedDays.filter((day) => day !== "Wed")[3];
+      if (optionalDay) sessions.push({ ride: week.rides[3], day: optionalDay, completionIndex: 3, kind: week.rides[3][4] === "Rest" ? "rest" : "optional" });
+      return sessions.sort((left, right) => trainingDayOrder.indexOf(left.day) - trainingDayOrder.indexOf(right.day));
     }
     function formatHours(minutes) {
       const hours = Math.floor(minutes / 60);
@@ -593,6 +689,23 @@
         const date = new Date(`${test.testedOn}T12:00:00`).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
         return `<div class="ftp-test-row" role="listitem" aria-label="FTP ${value} watts tested ${date}"><span class="ftp-test-date">${date}</span><span class="ftp-test-track" aria-hidden="true"><span class="ftp-test-bar" style="width:${width}%"></span></span><span class="ftp-test-value">${value} W</span></div>`;
       }).join("");
+    }
+    function openStrengthDialog(day) {
+      const session = cyclingStrengthDetails[day];
+      if (!session) return;
+      document.querySelector("#strength-dialog-title").textContent = session.title;
+      document.querySelector("#strength-dialog-subtitle").textContent = session.subtitle;
+      document.querySelector("#exercise-detail-grid").innerHTML = session.exercises.map((exercise) => `
+        <article class="exercise-detail">
+          <img src="${exerciseImageBase}/${exercise.image}/0.jpg" alt="${exercise.alt}" loading="lazy">
+          <div class="exercise-detail-copy">
+            <h3>${exercise.name}</h3>
+            <div class="exercise-prescription">${exercise.dose}</div>
+            <p>${exercise.cue}</p>
+            <p><strong>Watch for:</strong> ${exercise.avoid}</p>
+          </div>
+        </article>`).join("");
+      document.querySelector("#strength-dialog").showModal();
     }
     function localCompletionRows(userId) {
       return Object.entries(saved).flatMap(([key, completed]) => {
@@ -793,41 +906,42 @@
       document.querySelector("#prev-week").disabled = currentWeek === 0;
       document.querySelector("#next-week").disabled = currentWeek === weeks.length - 1;
       const trainingDays = getTrainingDays();
-      const keyMinutes = durationForRides(week.rides.slice(0, 3));
-      const allMinutes = durationForRides(week.rides.slice(0, 4));
+      const sessions = scheduledRidesForWeek(week);
+      const coreMinutes = durationForRides(week.rides.slice(0, 3)) + estimatedMinutes(zone2Ride(week)[4]) + durationForRides(strengthRidesForWeek().map((session) => session.ride));
+      const allMinutes = coreMinutes + (sessions.find((session) => session.kind === "optional") ? estimatedMinutes(week.rides[3][4]) : 0);
       const availableMinutes = getWeeklyHours() * 60;
-      const hasOptionalRide = week.rides[3][5] === "Optional";
-      const includeFourthRide = trainingDays.length === 4 && (!hasOptionalRide || allMinutes <= availableMinutes);
-      const displayedRides = week.rides.slice(0, includeFourthRide ? 4 : 3);
-      const scheduledVolume = `~${formatHours(durationForRides(displayedRides))}`;
-      document.querySelector("#week-summary").innerHTML = `<span><strong>Focus</strong> ${week.focus}</span><span><strong>Scheduled volume</strong> ${scheduledVolume}</span><span><strong>Availability</strong> ${getWeeklyHours()} h · ${trainingDays.join(", ")}</span>${week.test ? "<span><strong>Checkpoint</strong> Recovery + FTP test</span>" : `<span><strong>Schedule</strong> 3 key rides${includeFourthRide && hasOptionalRide ? " + optional recovery" : ""}</span>`}`;
+      const optionalSession = sessions.find((session) => session.kind === "optional");
+      const includeOptionalRide = Boolean(optionalSession) && allMinutes <= availableMinutes;
+      const displayedSessions = sessions.filter((session) => session.kind !== "optional" || includeOptionalRide);
+      const scheduledVolume = `~${formatHours(displayedSessions.reduce((total, session) => total + estimatedMinutes(session.ride[4]), 0))}`;
+      document.querySelector("#week-summary").innerHTML = `<span><strong>Focus</strong> ${week.focus}</span><span><strong>Scheduled volume</strong> ${scheduledVolume}</span><span><strong>Availability</strong> ${getWeeklyHours()} h · ${trainingDays.join(", ")}</span>${week.test ? "<span><strong>Checkpoint</strong> Recovery + FTP test</span>" : `<span><strong>Schedule</strong> 3 key rides · Wed Zone 2 · Mon/Fri strength${includeOptionalRide ? " · optional recovery" : ""}</span>`}`;
       const warning = document.querySelector("#budget-warning");
-      if (keyMinutes > availableMinutes) {
+      if (coreMinutes > availableMinutes) {
         warning.hidden = false;
-        warning.textContent = `The three key sessions estimate about ${formatHours(keyMinutes)}, above your ${getWeeklyHours()} h availability. Do not cram them together; reduce session duration or revise your available hours.`;
-      } else if (hasOptionalRide && allMinutes > availableMinutes) {
+        warning.textContent = `The key rides, Wednesday Zone 2, and Monday/Friday strength estimate about ${formatHours(coreMinutes)}, above your ${getWeeklyHours()} h availability. Do not cram them together; revise your available hours or seek an adjusted plan.`;
+      } else if (optionalSession && !includeOptionalRide) {
         warning.hidden = false;
-        warning.textContent = trainingDays.length === 4
-          ? `The optional recovery ride is omitted to stay within your ${getWeeklyHours()} h weekly limit.`
-          : `The optional recovery ride is not scheduled on a three-day week. The key rides estimate about ${formatHours(keyMinutes)}.`;
+        warning.textContent = `The optional recovery ride is omitted to stay within your ${getWeeklyHours()} h weekly limit.`;
       } else {
         warning.hidden = true;
         warning.textContent = "";
       }
       document.querySelectorAll(".week-tab").forEach((tab, index) => tab.setAttribute("aria-current", String(index === currentWeek)));
-      workoutList.innerHTML = displayedRides.map((ride, index) => {
+      workoutList.innerHTML = displayedSessions.map((session) => {
+        const { ride, day, completionIndex, kind } = session;
         const [, title, zwift, description, duration, intensity] = ride;
-        const key = `${currentWeek}-${index}`;
+        const key = `${currentWeek}-${completionIndex}`;
         const completed = Boolean(saved[key]);
-        const isRestDay = zwift === "Off-bike recovery";
-        const optional = index === 3 && hasOptionalRide;
+        const isRestDay = kind === "rest";
+        const isStrength = kind === "strength";
+        const optional = kind === "optional";
         const route = routeForWorkout(zwift, duration);
         const wattTarget = wattTargetFor(description);
-        return `<article class="workout${completed ? " is-complete" : ""}${optional ? " optional" : ""}${isRestDay ? " rest-day" : ""}">
-          <div class="day">${trainingDays[index]}<span>${isRestDay ? "rest day" : optional ? "optional" : "key ride"}</span></div>
-          <div class="workout-copy"><div class="workout-title">${title}</div>${zwiftWorkoutLinks[zwift] ? `<a class="zwift-name" href="${zwiftWorkoutLinks[zwift]}" target="_blank" rel="noopener noreferrer" aria-label="View ${zwift} on What's on Zwift">ZWIFT · ${zwift} ↗</a>` : `<span class="zwift-name">ZWIFT · ${zwift}</span>`}${route ? `<div class="route-suggestion">ROUTE · <a class="route-link" href="${route.href}" target="_blank" rel="noopener noreferrer" aria-label="View the ${route.name} route details on What's on Zwift">${route.name} ↗</a><span>${route.details}</span></div>` : `<div class="route-suggestion">ROUTE · Rest day, no ride recommended</div>`}${wattTarget ? `<div class="power-target">${wattTarget}</div>` : ""}<div class="workout-desc">${description}</div></div>
+        return `<article class="workout${completed ? " is-complete" : ""}${optional ? " optional" : ""}${isRestDay ? " rest-day" : ""}${isStrength ? " strength-session" : ""}">
+          <div class="day">${day}<span>${isRestDay ? "rest day" : isStrength ? "strength" : optional ? "optional" : kind === "zone2" ? "aerobic" : "key ride"}</span></div>
+          <div class="workout-copy">${isStrength ? `<span class="strength-type">OFF-BIKE STRENGTH · CYCLING SUPPORT</span>` : ""}<div class="workout-title">${title}</div>${isStrength ? `<span class="zwift-name">STRENGTH · CYCLING FOCUSED</span>` : zwiftWorkoutLinks[zwift] ? `<a class="zwift-name" href="${zwiftWorkoutLinks[zwift]}" target="_blank" rel="noopener noreferrer" aria-label="View ${zwift} on What's on Zwift">ZWIFT · ${zwift} ↗</a>` : `<span class="zwift-name">OFF-BIKE · ${zwift}</span>`}${route ? `<div class="route-suggestion">ROUTE · <a class="route-link" href="${route.href}" target="_blank" rel="noopener noreferrer" aria-label="View the ${route.name} route details on What's on Zwift">${route.name} ↗</a><span>${route.details}</span></div>` : `<div class="route-suggestion">${isStrength ? "LOCATION · Home or gym with weights/bands" : "ROUTE · Rest day, no ride recommended"}</div>`}${wattTarget ? `<div class="power-target">${wattTarget}</div>` : ""}<div class="workout-desc">${description}</div>${isStrength ? `<button class="exercise-open" type="button" data-strength-day="${day}" aria-label="View ${day} cycling strength exercises">EXERCISE DETAILS ↗</button>` : ""}</div>
           <div class="workout-dose"><span class="duration">${duration}</span><span class="intensity">${intensity}</span></div>
-          <span class="complete-mark" aria-hidden="true"></span><button class="complete-button" type="button" aria-label="Mark ${trainingDays[index]} ${title} ${completed ? "incomplete" : "complete"}" aria-pressed="${completed}"></button>
+          <span class="complete-mark" aria-hidden="true"></span><button class="complete-button" type="button" data-completion-index="${completionIndex}" aria-label="Mark ${day} ${title} ${completed ? "incomplete" : "complete"}" aria-pressed="${completed}"></button>
         </article>`;
       }).join("");
       const keyRideCount = 3;
@@ -835,8 +949,9 @@
       document.querySelector("#progress-text").textContent = `${completeCount} of ${keyRideCount} key rides complete`;
       document.querySelector("#progress-fill").style.width = `${completeCount / keyRideCount * 100}%`;
       document.querySelector("#week-volume").textContent = scheduledVolume;
-      workoutList.querySelectorAll(".complete-button").forEach((button, index) => button.addEventListener("click", () => {
-        const key = `${currentWeek}-${index}`;
+      workoutList.querySelectorAll(".complete-button").forEach((button) => button.addEventListener("click", () => {
+        const completionIndex = Number(button.dataset.completionIndex);
+        const key = `${currentWeek}-${completionIndex}`;
         if (saved[key]) delete saved[key]; else saved[key] = true;
         persist();
         renderWeek();
@@ -850,6 +965,7 @@
           });
         }
       }));
+      workoutList.querySelectorAll(".exercise-open").forEach((button) => button.addEventListener("click", () => openStrengthDialog(button.dataset.strengthDay)));
     }
     function renderTabs() {
       document.querySelector("#week-tabs").innerHTML = weeks.map((week, index) => `<button class="week-tab${week.test ? " is-test" : ""}" type="button" aria-label="Week ${index + 1}${week.test ? ", FTP test week" : ""}" aria-current="${index === currentWeek}" title="Week ${index + 1}: ${week.focus}${week.test ? " · test week" : ""}">${index + 1}</button>`).join("");
@@ -873,6 +989,7 @@
       setTheme(theme);
     });
     document.querySelector("#print-plan").addEventListener("click", () => window.print());
+    document.querySelector("#close-strength-dialog").addEventListener("click", () => document.querySelector("#strength-dialog").close());
     const profileDialog = document.querySelector("#profile-dialog");
     function openProfileDialog() {
       document.querySelector("#profile-current-ftp").value = profile?.currentFtp || "";
@@ -890,12 +1007,13 @@
     document.querySelector("#cancel-profile").addEventListener("click", () => profileDialog.close());
     document.querySelector("#profile-form").addEventListener("submit", (event) => {
       event.preventDefault();
-      const selectedDays = trainingDayOrder.filter((day) => [...document.querySelectorAll('input[name="training-day"]:checked')].some((input) => input.value === day));
-      if (selectedDays.length < 3 || selectedDays.length > 4) {
-        showToast("Choose three key-ride days, with an optional fourth day.");
+      const selectedDays = trainingDayOrder.filter((day) => !fixedStrengthDays.includes(day) && [...document.querySelectorAll('input[name="training-day"]:checked')].some((input) => input.value === day));
+      const keyTrainingDays = selectedDays.filter((day) => day !== "Wed");
+      if (!selectedDays.includes("Wed") || selectedDays.length < 4 || selectedDays.length > 5 || keyTrainingDays.length < 3 || keyTrainingDays.length > 4) {
+        showToast("Include Wednesday Zone 2 and choose three or four key-ride days.");
         return;
       }
-      const keyDays = selectedDays.slice(0, 3).map((day) => trainingDayOrder.indexOf(day));
+      const keyDays = keyTrainingDays.slice(0, 3).map((day) => trainingDayOrder.indexOf(day));
       const hasRecoverySpacing = keyDays.every((day, index) => {
         const nextDay = keyDays[(index + 1) % keyDays.length];
         return (nextDay - day + trainingDayOrder.length) % trainingDayOrder.length >= 2;

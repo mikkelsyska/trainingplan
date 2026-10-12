@@ -143,37 +143,58 @@
       setValue("#profile-age", "38");
       setValue("#profile-max-hr", "188");
       setValue("#profile-weekly-hours", "3.5");
-      ["Tue", "Thu", "Sat", "Sun"].forEach((day) => setChecked(day, false));
-      ["Mon", "Tue", "Thu"].forEach((day) => setChecked(day, true));
+      ["Tue", "Wed", "Thu", "Sat", "Sun"].forEach((day) => setChecked(day, false));
+      ["Tue", "Wed", "Thu"].forEach((day) => setChecked(day, true));
       click("#profile-form button[type=submit]");
-      assertEqual(appDocument.querySelector("#profile-dialog").open, true, "Back-to-back key rides should be rejected");
-      assert(appDocument.querySelector("#toast").textContent.includes("rest day"), "Schedule error should explain the recovery spacing");
-
-      ["Mon", "Tue", "Thu"].forEach((day) => setChecked(day, false));
-      ["Mon", "Wed", "Fri"].forEach((day) => setChecked(day, true));
+      assertEqual(appDocument.querySelector("#profile-dialog").open, true, "Wednesday plus only two key days should be rejected");
+      assert(appDocument.querySelector("#toast").textContent.includes("three or four key-ride days"), "Schedule error should explain the required cycling days");
+      ["Tue", "Wed", "Thu", "Sat", "Sun"].forEach((day) => setChecked(day, false));
+      ["Tue", "Wed", "Thu", "Sat"].forEach((day) => setChecked(day, true));
       click("#profile-form button[type=submit]");
-      assertEqual(appDocument.querySelectorAll("#workout-list .workout").length, 3, "Three selected days should schedule only the key rides");
-      assertEqual([...appDocument.querySelectorAll("#workout-list .day")].map((node) => node.firstChild.textContent).join(","), "Mon,Wed,Fri", "Key rides should use the selected days");
-      assertEqual(appDocument.querySelector("#week-volume").textContent, "~3h 30m", "Scheduled volume should exclude an omitted recovery ride");
-      assert(appDocument.querySelector("#budget-warning").textContent.includes("optional recovery ride is not scheduled"), "A three-day schedule should omit the optional ride when it exceeds hours");
-      click("#week-tabs .week-tab:nth-child(2)");
+      assertEqual(appDocument.querySelectorAll("#workout-list .workout").length, 6, "Three key rides plus Wednesday and fixed strength sessions should be scheduled");
+      assertEqual([...appDocument.querySelectorAll("#workout-list .day")].map((node) => node.firstChild.textContent).join(","), "Mon,Tue,Wed,Thu,Fri,Sat", "Strength and cycling sessions should use their assigned days");
+      const wednesday = [...appDocument.querySelectorAll("#workout-list .workout")].find((card) => card.querySelector(".day").firstChild.textContent === "Wed");
+      assert(wednesday.querySelector(".workout-dose .intensity").textContent.includes("Zone 2"), "The Wednesday session should target Zone 2");
+      assert(wednesday.querySelector(".power-target").textContent.includes("126–147 W"), "Wednesday watts should be based on current FTP");
+      assert([...appDocument.querySelectorAll("#workout-list .day")].some((node) => node.firstChild.textContent === "Mon") && [...appDocument.querySelectorAll("#workout-list .day")].some((node) => node.firstChild.textContent === "Fri"), "Strength sessions should be scheduled on Monday and Friday");
       assert(appDocument.querySelector("#budget-warning").textContent.includes("above your 3.5 h availability"), "Over-budget key sessions should show a warning");
 
       click("#edit-profile");
-      setValue("#profile-weekly-hours", "4");
-      ["Mon", "Wed", "Fri"].forEach((day) => setChecked(day, false));
-      ["Tue", "Thu", "Sat", "Sun"].forEach((day) => setChecked(day, true));
+      setValue("#profile-weekly-hours", "6");
+      ["Tue", "Wed", "Thu", "Sat", "Sun"].forEach((day) => setChecked(day, true));
       click("#profile-form button[type=submit]");
       click("#week-tabs .week-tab:nth-child(1)");
-      assertEqual(appDocument.querySelectorAll("#workout-list .workout").length, 4, "A fourth day and sufficient hours should enable recovery");
+      assertEqual(appDocument.querySelectorAll("#workout-list .workout").length, 7, "A fifth cycling day and sufficient hours should enable optional recovery");
       assertEqual(appDocument.querySelector("#workout-list .workout:last-child .day").firstChild.textContent, "Sun", "Optional recovery should use the fourth selected day");
       click("#week-tabs .week-tab:nth-child(4)");
       assert(appDocument.querySelector("#workout-list .workout:last-child .day").textContent.includes("rest day"), "A deload rest session should be labeled as rest");
       await loadApp();
       click("#edit-profile");
-      assertEqual(appDocument.querySelector("#profile-weekly-hours").value, "4", "Weekly availability should persist");
-      assertEqual([...appDocument.querySelectorAll('input[name="training-day"]:checked')].map((input) => input.value).join(","), "Tue,Thu,Sat,Sun", "Training days should persist");
+      assertEqual(appDocument.querySelector("#profile-weekly-hours").value, "6", "Weekly availability should persist");
+      assertEqual([...appDocument.querySelectorAll('input[name="training-day"]:checked')].map((input) => input.value).join(","), "Tue,Wed,Thu,Sat,Sun", "Training days should persist");
       click("#cancel-profile");
+    }
+
+    async function testStrengthExerciseGuides() {
+      resetTestStorage();
+      await loadApp();
+      const mondayCard = appDocument.querySelector('.workout .exercise-open[data-strength-day="Mon"]').closest(".workout");
+      const fridayCard = appDocument.querySelector('.workout .exercise-open[data-strength-day="Fri"]').closest(".workout");
+      assert(mondayCard.classList.contains("strength-session") && fridayCard.classList.contains("strength-session"), "Strength sessions should use their distinct layout");
+      assert(mondayCard.querySelector(".workout-title").textContent.includes("Foundation"), "Monday should have a purpose-based strength name");
+      assert(fridayCard.querySelector(".workout-title").textContent.includes("Pre-ride"), "Friday should have a purpose-based strength name");
+      click('.exercise-open[data-strength-day="Mon"]');
+      assertEqual(appDocument.querySelector("#strength-dialog").open, true, "Monday exercise details should open in a dialog");
+      assert(appDocument.querySelector('.workout .day').textContent.includes("strength"), "Strength sessions should not be labeled as key rides");
+      assertEqual(appDocument.querySelectorAll("#exercise-detail-grid .exercise-detail").length, 5, "Monday guide should show all five exercises");
+      assert(appDocument.querySelector("#exercise-detail-grid").textContent.includes("Romanian deadlift"), "Monday guide should explain cycling hinge strength");
+      assert([...appDocument.querySelectorAll("#exercise-detail-grid img")].every((image) => image.alt && image.src.includes("free-exercise-db/main/exercises/")), "Each Monday exercise should have an accessible dataset image");
+      click("#close-strength-dialog");
+      click('.exercise-open[data-strength-day="Fri"]');
+      assertEqual(appDocument.querySelectorAll("#exercise-detail-grid .exercise-detail").length, 4, "Friday guide should show all four low-fatigue exercises");
+      assert(appDocument.querySelector("#strength-dialog-subtitle").textContent.includes("finish fresh"), "Friday guidance should protect the Saturday ride");
+      assert([...appDocument.querySelectorAll("#exercise-detail-grid img")].every((image) => image.alt && image.src.includes("free-exercise-db/main/exercises/")), "Each Friday exercise should have an accessible dataset image");
+      click("#close-strength-dialog");
     }
 
     async function testFtpHistoryUpdatesTargets() {
@@ -211,7 +232,7 @@
       resetTestStorage();
       await loadApp();
       click("#week-tabs .week-tab:nth-child(7)");
-      click("#workout-list .complete-button");
+      click('#workout-list .complete-button[data-completion-index="0"]');
       assertEqual(appDocument.querySelector("#progress-text").textContent, "1 of 3 key rides complete", "Ride completion should update progress");
       await loadApp();
       click("#week-tabs .week-tab:nth-child(7)");
@@ -227,7 +248,8 @@
         for (const workout of appDocument.querySelectorAll(".workout")) {
           const routeLink = workout.querySelector(".route-link");
           const restNote = workout.querySelector(".route-suggestion").textContent;
-          assert(routeLink?.href.startsWith("https://whatsonzwift.com/world/") || restNote.includes("no ride recommended"), "Each ride should link a route; rest days should recommend no ride");
+          const strengthSession = workout.querySelector(".zwift-name")?.textContent.includes("STRENGTH · CYCLING FOCUSED");
+          assert(routeLink?.href.startsWith("https://whatsonzwift.com/world/") || restNote.includes("no ride recommended") || strengthSession, "Each cycling ride should link a route; rest and strength sessions should not");
         }
       }
     }
@@ -247,6 +269,9 @@
       assert(schema.includes("Users read own FTP tests"), "FTP test history should have owner-only policies");
       assert(schema.includes("weekly_hours numeric"), "Weekly availability should be stored in the profile");
       assert(schema.includes("training_days text[]"), "Training days should be stored in the profile");
+      assert(schema.includes("cardinality(training_days) between 4 and 5"), "The database should require Wednesday plus key-ride days");
+      assert(schema.includes("'Wed' = any(training_days)"), "The database schedule should require Wednesday availability");
+      assert(schema.includes("workout_completions_workout_index_check check (workout_index between 0 and 6)"), "The completion table should allow Zone 2 and strength session indices");
       assert(schema.includes("using (user_id = (select auth.uid()))"), "RLS policies should scope records to the signed-in user");
     }
 
@@ -257,6 +282,7 @@
         ["Profile metrics, zones, and reload persistence", testProfileCalculationsAndPersistence],
         ["Reject invalid profile values", testInvalidProfileIsRejected],
         ["Schedule selected days within weekly availability", testWeeklyScheduleAndAvailability],
+        ["Show cycling strength exercises with images and cues", testStrengthExerciseGuides],
         ["Log FTP tests and recalculate future watt targets", testFtpHistoryUpdatesTargets],
         ["Persist workout progress by week", testWorkoutProgressPersists],
         ["Link routes across all training weeks", testRouteLinksAcrossPlan],
