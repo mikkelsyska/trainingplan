@@ -412,11 +412,11 @@
         <fieldset class="profile-schedule">
           <legend>AVAILABLE TRAINING DAYS</legend>
           <div class="schedule-days">
-            <label class="schedule-day"><input type="checkbox" name="training-day" value="Mon" disabled>Mon · weights</label>
+            <label class="schedule-day"><input type="checkbox" name="training-day" value="Mon" disabled>Mon · strength</label>
             <label class="schedule-day"><input type="checkbox" name="training-day" value="Tue" checked>Tue</label>
             <label class="schedule-day"><input type="checkbox" name="training-day" value="Wed" checked>Wed · Zone 2</label>
             <label class="schedule-day"><input type="checkbox" name="training-day" value="Thu" checked>Thu</label>
-            <label class="schedule-day"><input type="checkbox" name="training-day" value="Fri" disabled>Fri · weights</label>
+            <label class="schedule-day"><input type="checkbox" name="training-day" value="Fri" disabled>Fri · strength</label>
             <label class="schedule-day"><input type="checkbox" name="training-day" value="Sat" checked>Sat</label>
             <label class="schedule-day"><input type="checkbox" name="training-day" value="Sun" checked>Sun</label>
           </div>
@@ -571,9 +571,9 @@
         title: "Foundation strength",
         subtitle: "25 min · controlled strength · leave 2–3 reps in reserve",
         exercises: [
-          { name: "Goblet squat", dose: "2 × 6–8", image: "Goblet_Squat", alt: "Goblet squat example", cue: "Hold one weight close to your chest. Sit between your hips with your whole foot grounded; stand by driving evenly through the floor.", avoid: "Do not let your knees cave in or your heels lift." },
-          { name: "Romanian deadlift", dose: "2 × 6–8", image: "Romanian_Deadlift", alt: "Romanian deadlift example", cue: "Keep a soft knee bend and push your hips back. Lower the weight close to your legs until you feel hamstring tension, then stand by bringing the hips forward.", avoid: "Keep your back neutral; stop the lowering before your spine rounds." },
-          { name: "Split squat", dose: "2 × 6 each leg", image: "Smith_Single-Leg_Split_Squat", alt: "Split squat example", cue: "Use a comfortable staggered stance. Lower under control, keep the front foot planted, then drive through that foot to stand.", avoid: "Use bodyweight or light support first; do not chase depth if balance or knee comfort changes." },
+          { name: "Goblet squat", dose: "2 × 6–8", image: "Goblet_Squat", alt: "Kettlebell goblet squat example", cue: "Hold one kettlebell close to your chest. Sit between your hips with your whole foot grounded; stand by driving evenly through the floor.", avoid: "Do not let your knees cave in or your heels lift; use a kettlebell you can control." },
+          { name: "Single-leg kettlebell deadlift", dose: "2 × 6 each leg", image: "Kettlebell_One-Legged_Deadlift", alt: "Single-leg kettlebell deadlift example", cue: "Hold one kettlebell in the hand opposite your stance leg. Soften that knee, hinge at the hip, and lower the bell only as far as you can keep steady.", avoid: "Keep your back neutral and hips level; use a lighter kettlebell if balance or control slips." },
+          { name: "Bodyweight walking lunge", dose: "2 × 6 each leg", image: "Bodyweight_Walking_Lunge", alt: "Bodyweight walking lunge example", cue: "Step forward into a comfortable lunge, lower under control, then push through the front foot to continue.", avoid: "Keep your front knee tracking over your foot and shorten the step if balance changes." },
           { name: "Standing calf raise", dose: "2 × 10", image: "Standing_Calf_Raises", alt: "Standing calf raise example", cue: "Rise smoothly onto the balls of your feet, pause briefly, then lower with control through a comfortable range.", avoid: "Avoid bouncing or forcing a deep stretch." },
           { name: "Dead bug", dose: "2 × 8 each side", image: "Dead_Bug", alt: "Dead bug core exercise example", cue: "Lie on your back and brace gently. Lower the opposite arm and leg only as far as you can keep your lower back steady.", avoid: "Shorten the range if your lower back arches." }
         ]
@@ -582,10 +582,10 @@
         title: "Pre-ride strength",
         subtitle: "20 min · light activation · finish fresh for Saturday",
         exercises: [
-          { name: "Step-up", dose: "2 × 6 each leg", image: "Step-up_with_Knee_Raise", alt: "Step-up exercise example", cue: "Use a low, stable step. Place the whole foot on top, stand through that leg, and lower slowly.", avoid: "Do not push hard off the trailing foot or use a box that forces your hip to tuck." },
-          { name: "Hip thrust", dose: "2 × 8", image: "Barbell_Hip_Thrust", alt: "Hip thrust exercise example", cue: "Brace your trunk and drive through your feet to extend your hips. Pause briefly at the top without over-arching your back.", avoid: "Keep ribs down and stop when hips are extended; do not finish by arching the low back." },
-          { name: "Hamstring curl", dose: "2 × 8", image: "Lying_Leg_Curls", alt: "Lying leg curl exercise example", cue: "Curl the pad toward you smoothly, pause, then lower slowly while keeping your hips settled on the bench.", avoid: "Use a light load and avoid jerking the weight." },
-          { name: "Pallof press", dose: "2 × 8 each side", image: "Pallof_Press", alt: "Pallof press core exercise example", cue: "Stand side-on to a light cable or band. Brace, press your hands straight forward, resist rotation, and return with control.", avoid: "Keep hips and shoulders facing forward; step closer to the anchor if you twist." }
+          { name: "Bodyweight squat", dose: "2 × 6", image: "Bodyweight_Squat", alt: "Bodyweight squat example", cue: "Stand with feet about hip-width apart. Sit between your hips with your whole foot grounded, then stand smoothly.", avoid: "Keep your knees tracking over your feet and use a comfortable range." },
+          { name: "Single-leg glute bridge", dose: "2 × 6 each side", image: "Single_Leg_Glute_Bridge", alt: "Single-leg glute bridge example", cue: "Lie on your back with one foot planted. Brace gently and lift your hips by pressing through that foot; lower with control.", avoid: "Keep your pelvis level and stop before your lower back arches." },
+          { name: "Side bridge", dose: "2 × 15–20 sec each side", image: "Side_Bridge", alt: "Side bridge exercise example", cue: "Lie on your side, support yourself on your forearm, and lift your hips until your body forms a straight line.", avoid: "Keep your hips stacked; shorten the hold or bend your knees if needed." },
+          { name: "Dead bug", dose: "2 × 6 each side", image: "Dead_Bug", alt: "Dead bug core exercise example", cue: "Lie on your back and brace gently. Lower the opposite arm and leg only as far as you can keep your lower back steady.", avoid: "Shorten the range if your lower back arches." }
         ]
       }
     };
@@ -658,13 +658,13 @@
     function strengthRidesForWeek() {
       return [
         {
-          ride: ["Mon", "Foundation strength", "Strength training", "25 min. Goblet squat 2 × 6–8, Romanian deadlift 2 × 6–8, split squat 2 × 6 each leg, calf raise 2 × 10, and dead bug 2 × 8 each side. Use controlled form at RPE 6–7, leaving 2–3 reps in reserve.", "25 min", "Strength · controlled"],
+          ride: ["Mon", "Foundation strength", "Strength training", "25 min. Goblet squat (kettlebell) 2 × 6–8, single-leg kettlebell deadlift 2 × 6 each leg, bodyweight walking lunge 2 × 6 each leg, calf raise 2 × 10, and dead bug 2 × 8 each side. Use controlled form at RPE 6–7, leaving 2–3 reps in reserve.", "25 min", "Strength · controlled"],
           day: "Mon",
           completionIndex: 5,
           kind: "strength"
         },
         {
-          ride: ["Fri", "Pre-ride strength", "Strength training", "20 min low-fatigue session before Saturday's ride. Step-up 2 × 6 each leg, hip thrust 2 × 8, hamstring curl 2 × 8, and Pallof press 2 × 8 each side. Keep the load light, move smoothly, and stop well before fatigue.", "20 min", "Strength · light"],
+          ride: ["Fri", "Pre-ride strength", "Strength training", "20 min low-fatigue session before Saturday's ride. Bodyweight squat 2 × 6, single-leg glute bridge 2 × 6 each side, side bridge 2 × 15–20 seconds each side, and dead bug 2 × 6 each side. Move smoothly and finish fresh.", "20 min", "Strength · light"],
           day: "Fri",
           completionIndex: 6,
           kind: "strength"
@@ -963,7 +963,7 @@
         const wattTarget = wattTargetFor(description);
         return `<article class="workout${completed ? " is-complete" : ""}${optional ? " optional" : ""}${isRestDay ? " rest-day" : ""}${isStrength ? " strength-session" : ""}">
           <div class="day">${day}<span>${isRestDay ? "rest day" : isStrength ? "strength" : optional ? "optional" : kind === "zone2" ? "aerobic" : "key ride"}</span></div>
-          <div class="workout-copy">${isStrength ? `<span class="strength-type">OFF-BIKE STRENGTH · CYCLING SUPPORT</span>` : ""}<div class="workout-title">${title}</div>${isStrength ? `<span class="zwift-name">STRENGTH · CYCLING FOCUSED</span>` : zwiftWorkoutLinks[zwift] ? `<a class="zwift-name" href="${zwiftWorkoutLinks[zwift]}" target="_blank" rel="noopener noreferrer" aria-label="View ${zwift} on What's on Zwift">ZWIFT · ${zwift} ↗</a>` : `<span class="zwift-name">OFF-BIKE · ${zwift}</span>`}${route ? `<div class="route-suggestion">ROUTE · <a class="route-link" href="${route.href}" target="_blank" rel="noopener noreferrer" aria-label="View the ${route.name} route details on What's on Zwift">${route.name} ↗</a><span>${route.details}</span></div>` : `<div class="route-suggestion">${isStrength ? "LOCATION · Home or gym with weights/bands" : "ROUTE · Rest day, no ride recommended"}</div>`}${manualRide ? `<div class="route-suggestion">MANUAL SESSION · Follow the planned duration and effort in Zwift</div>` : ""}${wattTarget ? `<div class="power-target">${wattTarget}</div>` : ""}<div class="workout-desc">${description}</div>${isStrength ? `<button class="exercise-open" type="button" data-strength-day="${day}" aria-label="View ${day} cycling strength exercises">EXERCISE DETAILS ↗</button>` : ""}</div>
+          <div class="workout-copy">${isStrength ? `<span class="strength-type">OFF-BIKE STRENGTH · CYCLING SUPPORT</span>` : ""}<div class="workout-title">${title}</div>${isStrength ? `<span class="zwift-name">STRENGTH · CYCLING FOCUSED</span>` : zwiftWorkoutLinks[zwift] ? `<a class="zwift-name" href="${zwiftWorkoutLinks[zwift]}" target="_blank" rel="noopener noreferrer" aria-label="View ${zwift} on What's on Zwift">ZWIFT · ${zwift} ↗</a>` : `<span class="zwift-name">OFF-BIKE · ${zwift}</span>`}${route ? `<div class="route-suggestion">ROUTE · <a class="route-link" href="${route.href}" target="_blank" rel="noopener noreferrer" aria-label="View the ${route.name} route details on What's on Zwift">${route.name} ↗</a><span>${route.details}</span></div>` : `<div class="route-suggestion">${isStrength ? "LOCATION · Home · floor space; optional kettlebell" : "ROUTE · Rest day, no ride recommended"}</div>`}${manualRide ? `<div class="route-suggestion">MANUAL SESSION · Follow the planned duration and effort in Zwift</div>` : ""}${wattTarget ? `<div class="power-target">${wattTarget}</div>` : ""}<div class="workout-desc">${description}</div>${isStrength ? `<button class="exercise-open" type="button" data-strength-day="${day}" aria-label="View ${day} cycling strength exercises">EXERCISE DETAILS ↗</button>` : ""}</div>
           <div class="workout-dose"><span class="duration">${actualDuration}</span><span class="intensity">${intensity}</span></div>
           <span class="complete-mark" aria-hidden="true"></span><button class="complete-button" type="button" data-completion-index="${completionIndex}" aria-label="Mark ${day} ${title} ${completed ? "incomplete" : "complete"}" aria-pressed="${completed}"></button>
         </article>`;

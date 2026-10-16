@@ -183,16 +183,21 @@
       assert(mondayCard.classList.contains("strength-session") && fridayCard.classList.contains("strength-session"), "Strength sessions should use their distinct layout");
       assert(mondayCard.querySelector(".workout-title").textContent.includes("Foundation"), "Monday should have a purpose-based strength name");
       assert(fridayCard.querySelector(".workout-title").textContent.includes("Pre-ride"), "Friday should have a purpose-based strength name");
+      assert(/optional kettlebell/i.test(mondayCard.textContent) && /optional kettlebell/i.test(fridayCard.textContent), "Strength cards should state that only a kettlebell is optional equipment");
+      assert(!/dumbbell|barbell|band|machine|bench|box|cable|step[- ]?up/i.test(`${mondayCard.textContent} ${fridayCard.textContent}`), "Strength prescriptions should not require non-kettlebell equipment");
       click('.exercise-open[data-strength-day="Mon"]');
       assertEqual(appDocument.querySelector("#strength-dialog").open, true, "Monday exercise details should open in a dialog");
       assert(appDocument.querySelector('.workout .day').textContent.includes("strength"), "Strength sessions should not be labeled as key rides");
       assertEqual(appDocument.querySelectorAll("#exercise-detail-grid .exercise-detail").length, 5, "Monday guide should show all five exercises");
-      assert(appDocument.querySelector("#exercise-detail-grid").textContent.includes("Romanian deadlift"), "Monday guide should explain cycling hinge strength");
+      assert(appDocument.querySelector("#exercise-detail-grid").textContent.includes("Single-leg kettlebell deadlift"), "Monday guide should explain cycling hinge strength");
+      assert(appDocument.querySelector("#exercise-detail-grid").textContent.includes("kettlebell"), "Monday guide should identify the only optional equipment");
+      assert(!/dumbbell|barbell|band|machine|bench|box|cable/i.test(appDocument.querySelector("#exercise-detail-grid").textContent), "Monday guide should not suggest non-kettlebell equipment");
       assert([...appDocument.querySelectorAll("#exercise-detail-grid img")].every((image) => image.alt && image.src.includes("free-exercise-db/main/exercises/")), "Each Monday exercise should have an accessible dataset image");
       click("#close-strength-dialog");
       click('.exercise-open[data-strength-day="Fri"]');
       assertEqual(appDocument.querySelectorAll("#exercise-detail-grid .exercise-detail").length, 4, "Friday guide should show all four low-fatigue exercises");
       assert(appDocument.querySelector("#strength-dialog-subtitle").textContent.includes("finish fresh"), "Friday guidance should protect the Saturday ride");
+      assert(!/kettlebell|dumbbell|barbell|band|machine|bench|box|cable/i.test(appDocument.querySelector("#exercise-detail-grid").textContent), "Friday guide should be bodyweight-only");
       assert([...appDocument.querySelectorAll("#exercise-detail-grid img")].every((image) => image.alt && image.src.includes("free-exercise-db/main/exercises/")), "Each Friday exercise should have an accessible dataset image");
       click("#close-strength-dialog");
     }
